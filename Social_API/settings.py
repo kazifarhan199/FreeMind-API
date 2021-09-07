@@ -39,18 +39,21 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+
+    'accounts',
+    'groups',
 ]
 
 AUTHENTICATION_BACKENDS = ['Social_API.midware.EmailOrUsernameModelBackend', ]
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        'Social_API.authentication.DeviceAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
 }
 
 
@@ -134,8 +137,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT= Path(BASE_DIR, "static")
+
+MEDIA_URL= '/media/'
+MEDIA_ROOT= Path(BASE_DIR, "media")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email Provider
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+PROJECT_NAME = 'PhamilyHealth'
