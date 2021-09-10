@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     'accounts',
+    'groups',
 ]
 
 AUTHENTICATION_BACKENDS = ['Social_API.midware.EmailOrUsernameModelBackend', ]
