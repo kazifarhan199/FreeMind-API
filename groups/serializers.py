@@ -14,14 +14,19 @@ class GroupsMemberSerializer(serializers.ModelSerializer):
 
     def get_userimage(self, obj):
         return obj.userimage
+        
 
-    def is_valid(self):
-        super().is_valid()
-        email=self.context['request'].data.get('email')
-        instance_user=self.context['request'].user
+    def validate(self, valid_data):
+        user=User.objects.get(email=self.context['request'].data.get('email'))
+        valid_data['user'] = user
+
+        email = self.context['request'].data.get('email')
+        instance_user = self.context['request'].user
+
         # Change to take group id from user (SINGLEUSERCONSTRAINT)
         if not GroupsMember.objects.filter(user=instance_user).exists():
             raise serializers.ValidationError({"group": ["Access Denied."]})
+            
         group=GroupsMember.objects.filter(user=instance_user).first().group.id
         if not group:
             raise serializers.ValidationError({"group": ["This field is required."]})
@@ -46,13 +51,8 @@ class GroupsMemberSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"email": ["User already in a group."]})
         #
 
-        return True
-
-    def validate(self, valid_data):
-        user=User.objects.get(email=self.context['request'].data.get('email'))
-        valid_data['user'] = user
         # Change to take group id from user (SINGLEUSERCONSTRAINT)
-        valid_data['group'] = GroupsMember.objects.filter(user=self.context['request'].user).first().group
+        valid_data['group'] = GroupsMember.objects.filter(user=instance_user).first().group
         #
         return super().validate(valid_data)
 
