@@ -2,6 +2,7 @@ import random
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework import permissions
+from rest_framework import response
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -22,6 +23,25 @@ class Register(CreateAPIView):
         permissions.AllowAny # Or anon users can't register
     ]
     serializer_class = serializers.UserSerializer
+
+    def post(self, request):
+        if not request.data.get('devicetoken'):
+            return Response({'devicetoken': ['This field is required', ]}, status=status.HTTP_400_BAD_REQUEST) 
+        if not request.data.get('devicename'):
+            return Response({'devicename': ['This field is required', ]}, status=status.HTTP_400_BAD_REQUEST) 
+        if not request.data.get('devicetype'):
+            return Response({'devicetype': ['This field is required', ]}, status=status.HTTP_400_BAD_REQUEST) 
+
+        respense = super().post(request)
+        if (respense.data.get('id')):
+            user = User.objects.get(pk=respense.data['id'])
+            if Device.objects.filter(devicetoken=request.data['devicetoken']).exists():
+                Device.objects.filter(devicetoken=request.data['devicetoken']).delete()
+            Device.objects.create(user=user, devicetoken=request.data['devicetoken'], devicename=request.data['devicename'], devicetype=request.data['devicetype'])
+            
+            return Response(serializers.UserSerializer(user).data)
+        else:
+            return response
 
 
 class Login(ObtainAuthToken):
