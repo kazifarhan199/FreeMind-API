@@ -35,6 +35,7 @@ class GroupsView(APIView):
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class GroupsMemberView(APIView):
     serializer_class = serializers.GroupsMemberSerializer
 
