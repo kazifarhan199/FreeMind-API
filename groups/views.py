@@ -11,9 +11,12 @@ class GroupsView(APIView):
     serializer_class = serializers.GroupsSerializer
 
     def get(self, request):
+        if not GroupsMember.objects.filter(user=request.user).exists():
+            return Response({"group": ["Group Not found."]}, status=status.HTTP_400_BAD_REQUEST)
+
         # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
-        group = Groups.objects.filter(user=request.user)
-        serializer = self.serializer_class(group, many=True)
+        group = GroupsMember.objects.filter(user=request.user).first().group
+        serializer = self.serializer_class(group)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def post(self, request):
