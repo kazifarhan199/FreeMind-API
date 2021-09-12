@@ -41,7 +41,7 @@ class Register(CreateAPIView):
             
             return Response(serializers.UserSerializer(user).data)
         else:
-            return response
+            return respense
 
 
 class Login(ObtainAuthToken):
@@ -123,7 +123,6 @@ class PasswordReset(APIView):
             else:
                 return Response({"otp": ["PIN has expired.",]}, status=status.HTTP_400_BAD_REQUEST)
 
-
         elif request.data.get('email') and request.data.get('otp'):
             """Check otp"""
             check = check_otp_http_response_if_failed(request.data['email'], request.data['otp'])
@@ -144,6 +143,9 @@ class PasswordReset(APIView):
 
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response({"email": ["This field is required", ]}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Devices(APIView):
