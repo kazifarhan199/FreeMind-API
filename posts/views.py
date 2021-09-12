@@ -1,9 +1,10 @@
-from groups.models import GroupsMember
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from groups.models import GroupsMember
+from groups.permissions import IsInGroup
 from .pagination import PostPageNumberPagination
 from .models import Post, PostComment, PostLike
 from . import serializers
@@ -11,7 +12,7 @@ from . import permissions
 
 
 class PostCreateView(APIView):
-    permission_classes = (IsAuthenticated, permissions.isinGroup, )
+    permission_classes = (IsAuthenticated, IsInGroup, )
 
     def post(self, request):
         data = request.data.copy()
@@ -25,7 +26,7 @@ class PostCreateView(APIView):
 
 
 class PostListView(ListAPIView):
-    permission_classes = (IsAuthenticated, permissions.isinGroup, )
+    permission_classes = (IsAuthenticated, IsInGroup, )
     serializer_class = serializers.PostSerializer
     pagination_class = PostPageNumberPagination
     

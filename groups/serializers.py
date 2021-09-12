@@ -22,10 +22,6 @@ class GroupsMemberSerializer(serializers.ModelSerializer):
 
         email = self.context['request'].data.get('email')
         instance_user = self.context['request'].user
-
-        # Change to take group id from user (SINGLEUSERCONSTRAINT)
-        if not GroupsMember.objects.filter(user=instance_user).exists():
-            raise serializers.ValidationError({"group": ["Access Denied."]})
             
         group=GroupsMember.objects.filter(user=instance_user).first().group.id
         if not group:

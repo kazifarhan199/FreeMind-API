@@ -19,16 +19,6 @@ class hasPostField(BasePermission):
                 self.message = "post field is required"
                 return False
             post = request.data.get('post')
-            
-
-class isinGroup(BasePermission):
-    message = "Access denied"
-
-    def has_permission(self, request, view):
-        group = GroupsMember.objects.filter(user=request.user)
-        if not group.exists():
-            return False
-        return True
 
 
 class hasGroup_PostExists_UserBelongToPostGroup(BasePermission):

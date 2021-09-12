@@ -1,23 +1,16 @@
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from .models import Groups, GroupsMember, User
 from . import serializers
+from . import permissions
 
 User = get_user_model()
 
-class GroupsView(APIView):
+class GroupsCreateView(APIView):
     serializer_class = serializers.GroupsSerializer
-
-    def get(self, request):
-        if not GroupsMember.objects.filter(user=request.user).exists():
-            return Response({"group": ["Group Not found."]}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
-        group = GroupsMember.objects.filter(user=request.user).first().group
-        serializer = self.serializer_class(group)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def post(self, request):
         data = request.data.copy()
@@ -27,6 +20,16 @@ class GroupsView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class GroupsView(APIView):
+    serializer_class = serializers.GroupsSerializer
+    permission_classes = (IsAuthenticated, permissions.IsInGroup)
+
+    def get(self, request):
+        # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
+        group = GroupsMember.objects.filter(user=request.user).first().group
+        serializer = self.serializer_class(group)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def put(self, request):
         data = request.data.copy()
@@ -41,6 +44,7 @@ class GroupsView(APIView):
 
 class GroupsMemberView(APIView):
     serializer_class = serializers.GroupsMemberSerializer
+    permission_classes = (IsAuthenticated, permissions.IsInGroup)
 
     def post(self, request):
         serializer = serializers.GroupsMemberSerializer(data=request.data, context={'request': request})
