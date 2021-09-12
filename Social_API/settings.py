@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
     'accounts',
     'groups',
+    'posts',
 ]
 
 AUTHENTICATION_BACKENDS = ['Social_API.midware.EmailOrUsernameModelBackend', ]
