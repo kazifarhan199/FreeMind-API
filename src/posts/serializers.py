@@ -63,9 +63,18 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class PostLikeSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField('get_username')
+    userimage = serializers.SerializerMethodField('get_userimage')
+
+    def get_username(self, obj):
+        return obj.username()
+
+    def get_userimage(self, obj):
+        return obj.user_image()
+
     class Meta:
         model = PostLike
-        fields = '__all__'
+        fields = ['username', 'userimage', 'user', 'post']
         validators = [
             serializers.UniqueTogetherValidator(
                 queryset=model.objects.all(),
@@ -98,9 +107,18 @@ class PostLikeSerializer(serializers.ModelSerializer):
 
 
 class PostCommentSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField('get_username')
+    userimage = serializers.SerializerMethodField('get_userimage')
+
+    def get_username(self, obj):
+        return obj.user.username
+
+    def get_userimage(self, obj):
+        return obj.user.image
+
     class Meta:
         model = PostComment
-        fields = "__all__"
+        fields = ["id", "text", "created_on", "need_feadback", "username", "userimage", 'post', ]
 
 
     def is_valid(self):

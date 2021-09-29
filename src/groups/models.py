@@ -5,11 +5,11 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class Groups(models.Model):
-    name = models.CharField(max_length=200)
+    group_name = models.CharField(max_length=200)
     user = models.ForeignKey(User, models.CASCADE, related_name='profilegroup')
 
     def __str__(self):
-        return str(self.name)
+        return str(self.group_name)
 
 
 class GroupsMember(models.Model):

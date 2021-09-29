@@ -59,11 +59,11 @@ class GroupsMemberSerializer(serializers.ModelSerializer):
 
 class GroupsSerializer(serializers.ModelSerializer):
     members = GroupsMemberSerializer(many=True, read_only=True)
-    name = serializers.CharField()
+    group_name = serializers.CharField()
 
     class Meta:
         model = Groups
-        fields = ('name', 'members', 'user', 'id', )
+        fields = ('group_name', 'members', 'user', 'id', )
 
     def create(self, valid_data):
         instance_user = self.context['request'].user

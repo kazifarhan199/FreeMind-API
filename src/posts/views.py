@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from groups.models import GroupsMember
 from groups.permissions import IsInGroup
-from .pagination import PostPageNumberPagination
+from .pagination import PostPageNumberPagination, PostPageNumberPagination1000
 from .models import Post, PostComment, PostLike
 from . import serializers
 from . import permissions
@@ -67,18 +67,20 @@ class PostDeleteView(APIView):
         return Response({'detail': ["Post deleted.", ]}, status=status.HTTP_202_ACCEPTED)
 
 
+class PostLikesListView(ListAPIView):
+    permission_classes = (IsAuthenticated, permissions.hasGroup_PostExists_UserBelongToPostGroup, )
+    serializer_class = serializers.PostLikeSerializer
+    pagination_class = PostPageNumberPagination1000
+    
+    def get_queryset(self):
+        queryset = PostLike.objects.filter(
+                post = Post.objects.get(pk=self.request.GET.get('post'))
+            )
+        return queryset.order_by('-id')
+
 class PostLikeView(APIView):
     permission_classes = (IsAuthenticated, permissions.hasGroup_PostExists_UserBelongToPostGroup, )
 
-    def get(Self, request):
-        serializer = serializers.PostLikeSerializer(
-            PostLike.objects.filter(
-                post = Post.objects.get(pk=request.GET.get('post'))
-            ), 
-            context={'request':request},
-            many=True,
-        )
-        return Response(serializer.data) 
 
     def post(self, request):
         data = request.data.copy()
@@ -106,18 +108,19 @@ class PostLikeView(APIView):
         return Response({'detail': ["like removed.", ]}, status=status.HTTP_202_ACCEPTED)
 
 
+class PostCommentListView(ListAPIView):
+    permission_classes = (IsAuthenticated, permissions.hasGroup_PostExists_UserBelongToPostGroup, )
+    serializer_class = serializers.PostCommentSerializer
+    pagination_class = PostPageNumberPagination1000
+    
+    def get_queryset(self):
+        queryset = PostComment.objects.filter(
+                post = Post.objects.get(pk=self.request.GET.get('post'))
+            )
+        return queryset.order_by('-created_on')
+
 class PostCommentView(APIView):
     permission_classes = (IsAuthenticated, permissions.hasGroup_PostExists_UserBelongToPostGroup, )
-
-    def get(Self, request):
-        serializer = serializers.PostCommentSerializer(
-            PostComment.objects.filter(
-                post = Post.objects.get(pk=request.GET.get('post'))
-            ), 
-            context={'request':request},
-            many=True,
-        )
-        return Response(serializer.data) 
 
     def post(self, request):
         data = request.data.copy()

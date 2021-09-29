@@ -2,6 +2,7 @@ import collections
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import OTP, Device
+from groups.models import Groups, GroupsMember
 
 User = get_user_model()
 
@@ -9,6 +10,15 @@ class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=False)
     password = serializers.CharField(required=False, write_only=True)
     email = serializers.EmailField(required=False)
+    gid = serializers.SerializerMethodField('get_gid', read_only=True)
+    img_obj = serializers.ImageField(allow_null=True, required=False, write_only=True)
+
+    def get_gid(self, obj):
+        if GroupsMember.objects.filter(user=obj).exists():
+            return GroupsMember.objects.filter(user=obj).first().id
+        else:
+            return 0
+
 
     def validate(self, value):
         data = dict(value)
@@ -28,11 +38,11 @@ class UserSerializer(serializers.ModelSerializer):
         else:
             """Register a new user"""
             if not data.get('username'):
-                raise serializers.ValidationError({"username": ["This field is required."]})
+                raise serializers.ValidationError({"username": ["Username field is required."]})
             if not data.get('email'):
-                raise serializers.ValidationError({"email": ["This field is required."]})
+                raise serializers.ValidationError({"email": ["Email field is required."]})
             if not data.get('password'):
-                raise serializers.ValidationError({"password": ["This field is required."]})
+                raise serializers.ValidationError({"password": ["password field is required."]})
             
             if User.objects.filter(username=data['username']).exists():
                 raise serializers.ValidationError({"username": ["A user with that username already exists."]})
@@ -41,6 +51,11 @@ class UserSerializer(serializers.ModelSerializer):
 
         return super().validate(value)
 
+    def update(self, instance, validated_data): 
+        if validated_data.get('img_obj', False):
+            instance.profile.image = validated_data.get('img_obj', instance.profile.image)
+            instance.profile.save()
+        return super().update(instance, validated_data)
 
     def create(self, validated_data):
         """Register a new user"""
@@ -53,7 +68,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'id', 'token', 'password', 'image', ]
+        fields = ['username', 'email', 'id', 'token', 'password', 'image', 'gid', 'img_obj', ]
 
 
 class OTPSerializer(serializers.ModelSerializer):

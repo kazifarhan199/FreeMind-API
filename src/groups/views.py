@@ -3,6 +3,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
+
+from accounts.serializers import UserSerializer
 from .models import Groups, GroupsMember, User
 from . import serializers
 from . import permissions
@@ -29,7 +31,7 @@ class GroupsView(APIView):
         # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
         group = GroupsMember.objects.filter(user=request.user).first().group
         serializer = self.serializer_class(group)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request):
         data = request.data.copy()
@@ -46,11 +48,26 @@ class GroupsMemberView(APIView):
     serializer_class = serializers.GroupsMemberSerializer
     permission_classes = (IsAuthenticated, permissions.IsInGroup)
 
+    def get(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({"email": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+
+        if GroupsMember.objects.filter(user__email=email).exists():
+            return Response({'detail': ['User unavailable']}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            if User.objects.filter(email=email).exists():
+                return Response(UserSerializer(User.objects.get(email=email)).data)
+            else:
+                return Response({'detail': ['User unavailable']}, status=status.HTTP_404_NOT_FOUND)
+
+
+
     def post(self, request):
         serializer = serializers.GroupsMemberSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):

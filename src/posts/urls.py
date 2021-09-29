@@ -6,6 +6,8 @@ urlpatterns = [
     path('create/', views.PostCreateView.as_view(), name='post-create'),
     path('detail/', views.PostDetailView.as_view(), name='post-detail'),
     path('delete/', views.PostDeleteView.as_view(), name='post-delete'),
-    path('likes/', views.PostLikeView.as_view(), name='post-likes'),
-    path('comments/', views.PostCommentView.as_view(), name='comments-likes'),
+    path('likes/', views.PostLikesListView.as_view(), name='post-likes'),
+    path('likes/detail/', views.PostLikeView.as_view(), name='post-likes'),
+    path('comments/', views.PostCommentListView.as_view(), name='post-comments'),
+    path('comments/detail/', views.PostCommentView.as_view(), name='post-comments'),
 ]
