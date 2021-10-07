@@ -88,3 +88,9 @@ Post.add_to_class('image', image)
 Post.add_to_class('images', images)    
 Post.add_to_class('like_count', like_count)    
 Post.add_to_class('comment_count', comment_count)    
+
+import posts.signals as post_signals
+
+signals.post_save.connect(post_signals.postCreatedNotification, sender=Post)
+signals.post_save.connect(post_signals.commentCreatedNotification, sender=PostComment)
+signals.post_save.connect(post_signals.likeCreatedNotification, sender=PostLike)

@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'accounts',
     'groups',
     'posts',
+    'notifications',
 ]
 
 AUTHENTICATION_BACKENDS = ['Social_API.midware.EmailOrUsernameModelBackend', ]
@@ -128,3 +129,5 @@ MEDIA_ROOT= Path(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 PROJECT_NAME = 'PhamilyHealth'
+
+FIREBASE_PROJECT_KEY= 'AAAAheuQRhQ:APA91bHo-9rP9sn7Mhlopb3C77UpZ6Vd9umFj9HZGBcu4YQuDdTj8-miX9EHkFRx3zPCkCgUurgS1WT7pBPlGDGGrkKI0Ul8RlkPuCvxgB3KbpGFrGpGEhigib1wWU4OH-7Q-V9Aif2P'
