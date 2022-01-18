@@ -36,6 +36,8 @@ def sendNotifications(sender, instance, created, **kwargs):
             'https://fcm.googleapis.com/fcm/send', 
             data = json.dumps({
                 "to": d.devicetoken,
+                "mutable_content" : True,
+                "content_available": True,
                 "data": data,
                 "notification": {
                 }
