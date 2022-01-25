@@ -1,10 +1,18 @@
 from notifications.models import Notification
 from groups.models import GroupsMember
-
+from django.contrib.auth import get_user_model
 from .models import PostComment
 
+User = get_user_model()
+
+
 def postCreatedNotification(sender, instance, created, **kwargs):
-    
+    # Sending recommendation
+    if created:
+        # Ussing Bot user to send notifications
+        PostComment.objects.create(user=User.objects.get(pk=4), post=instance, text='New recommendation')
+
+    # Sending notification
     if created:
         # If a new post is created 
         group_members = GroupsMember.objects.filter(group=instance.group).exclude(user=instance.user)
