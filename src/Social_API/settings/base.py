@@ -131,3 +131,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 PROJECT_NAME = 'PhamilyHealth'
 
 FIREBASE_PROJECT_KEY= 'AAAARVQhCgA:APA91bGemTw3miRbIQtYgIG1LbgG1Fxc7JkTPlZzP51d9uLnDWIMhQTK186WfkfY1rJHIll-mGnCd-r7gqhhUM_PlW4asnjrJd-QyptD1_vOicjK0LbdlUOQPOsbh6vFmuB62-53YI_k'
+
+MODELS_PATH = Path(BASE_DIR, 'models')
+MODEL_NAME = 'bert-base-model-trained-2022-01-25 15 14 02.143702'

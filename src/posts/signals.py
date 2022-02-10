@@ -2,6 +2,7 @@ from notifications.models import Notification
 from groups.models import GroupsMember
 from django.contrib.auth import get_user_model
 from .models import PostComment
+from .utils import get_estimation
 
 User = get_user_model()
 
@@ -9,8 +10,9 @@ User = get_user_model()
 def postCreatedNotification(sender, instance, created, **kwargs):
     # Sending recommendation
     if created:
+        text = get_estimation([instance.title, ])
         # Ussing Bot user to send notifications
-        PostComment.objects.create(user=User.objects.get(pk=4), post=instance, text='New recommendation')
+        PostComment.objects.create(user=User.objects.get(pk=4), post=instance, text=text)
 
     # Sending notification
     if created:
