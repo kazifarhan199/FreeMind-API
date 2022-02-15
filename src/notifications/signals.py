@@ -17,7 +17,7 @@ def sendNotifications(sender, instance, created, **kwargs):
                     "click_action":"FLUTTER_NOTIFICATION_CLICK",
                     "notification_id": instance.id,
                     "for": "likes",
-                    "title": str(instance.post_like.user.username)+" like you'r post", 
+                    "title": instance.text, 
                     "body": "",
                     "id": str(instance.post.id),
                 }
@@ -26,7 +26,7 @@ def sendNotifications(sender, instance, created, **kwargs):
                     "click_action":"FLUTTER_NOTIFICATION_CLICK",
                     "notification_id": instance.id,
                     "for": "comment",
-                    "title": str(instance.post_comment.user.username)+" commented on your post", 
+                    "title": instance.text, 
                     "body": "",
                     "id": str(instance.post.id),
                 }
@@ -35,7 +35,7 @@ def sendNotifications(sender, instance, created, **kwargs):
                     "click_action":"FLUTTER_NOTIFICATION_CLICK",
                     "notification_id": instance.id,
                     "for": "home",
-                    "title": str(instance.post.user.username)+" created a new post", 
+                    "title": instance.text, 
                     "body": instance.post.title,
                     'id':str(instance.post.id),
                 }

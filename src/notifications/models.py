@@ -14,6 +14,7 @@ class Notification(models.Model):
     post_like = models.ForeignKey(PostLike, models.CASCADE, null=True)
     seen = models.BooleanField(default=False)
     show = models.BooleanField(default=True)
+    text = models.CharField(max_length=300)
 
 
     def __str__(self):
