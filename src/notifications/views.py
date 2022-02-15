@@ -19,7 +19,7 @@ class NotificationListView(APIView):
         queryset = self.model.objects.filter(
             user=request.user
         ).order_by('-created_on')
-        data = NotificationSerializer(queryset, many=True).data
+        data = {"notifications": NotificationSerializer(queryset, many=True).data}
         return Response(data)
 
     def post(self, request):
