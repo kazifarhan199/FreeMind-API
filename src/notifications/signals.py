@@ -26,7 +26,7 @@ def sendNotifications(sender, instance, created, **kwargs):
                     "click_action":"FLUTTER_NOTIFICATION_CLICK",
                     "notification_id": instance.id,
                     "for": "comment",
-                    "title": str(instance.post_like.user.username)+" commented on your post", 
+                    "title": str(instance.post_comment.user.username)+" commented on your post", 
                     "body": "",
                     "id": str(instance.post.id),
                 }
