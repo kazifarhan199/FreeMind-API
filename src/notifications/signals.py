@@ -21,6 +21,15 @@ def sendNotifications(sender, instance, created, **kwargs):
                     "body": "",
                     "id": str(instance.post.id),
                 }
+    elif instance.post_comment != None:
+        data = {
+                    "click_action":"FLUTTER_NOTIFICATION_CLICK",
+                    "notification_id": instance.id,
+                    "for": "comment",
+                    "title": str(instance.post_like.user.username)+" commented on your post", 
+                    "body": "",
+                    "id": str(instance.post.id),
+                }
     elif instance.post != None:
         data = {
                     "click_action":"FLUTTER_NOTIFICATION_CLICK",
