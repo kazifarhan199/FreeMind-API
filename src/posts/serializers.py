@@ -4,11 +4,23 @@ from django.http import request
 
 from rest_framework import serializers
 
-from .models import Post, PostImages, PostLike, PostComment
+from .models import Post, PostImages, PostLike, PostComment, CommentFeedback
 from groups.models import GroupsMember
 
 User = get_user_model()
 
+
+class CommentFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommentFeedback
+        fields = '__all__'
+
+    def validate(self, valid_data):
+        if valid_data['user'] != valid_data['comment'].post.user:
+            raise serializers.ValidationError({"user": ["You are not allowed to rate this comment."]})
+        if valid_data['comment'].need_feadback == False:
+            raise serializers.ValidationError({"user": ["You are not allowed to rate this comment."]})
+        return super().validate(valid_data)
 
 class PostImageSerializer(serializers.ModelSerializer):
     

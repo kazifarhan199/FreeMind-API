@@ -150,3 +150,20 @@ class PostCommentView(APIView):
             )
         ).delete()
         return Response({'detail': ["Comment removed.", ]}, status=status.HTTP_202_ACCEPTED)
+
+
+class CommentFeedbackView(APIView):
+    permission_classes = (IsAuthenticated, permissions.hasGroup_PostExists_UserBelongToPostGroup, )
+
+    def post(self, request):
+        data = request.data.copy()
+        data['user'] = request.user.id
+        serializer = serializers.CommentFeedbackSerializer(data=data, context={'request':request},)
+        if serializer.is_valid():
+            feedback = serializer.save()
+            c = PostComment.objects.get(pk=request.data['comment'])
+            c.need_feadback = False
+            c.save()            
+            print(PostComment.objects.get(pk=request.data['comment']).need_feadback)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

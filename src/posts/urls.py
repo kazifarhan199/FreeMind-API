@@ -10,4 +10,5 @@ urlpatterns = [
     path('likes/detail/', views.PostLikeView.as_view(), name='post-likes'),
     path('comments/', views.PostCommentListView.as_view(), name='post-comments'),
     path('comments/detail/', views.PostCommentView.as_view(), name='post-comments'),
+    path('feedback/', views.CommentFeedbackView.as_view(), name='feedback'),
 ]

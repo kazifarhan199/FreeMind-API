@@ -12,8 +12,10 @@ def postCreatedNotification(sender, instance, created, **kwargs):
     if created:
         text = get_estimation([instance.title, ])
         # Ussing Bot user to send notifications
-        PostComment.objects.create(user=User.objects.get(pk=4), post=instance, text=text)
-
+        try:
+            PostComment.objects.create(user=User.objects.get(pk=4), post=instance, text=text)
+        except:
+            print("Fix the bot id !!!")
     # Sending notification
     if created:
         # If a new post is created 

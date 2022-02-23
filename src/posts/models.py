@@ -2,6 +2,7 @@ import posts
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.db.models import signals
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from groups.models import Groups, GroupsMember
 
@@ -88,6 +89,22 @@ Post.add_to_class('image', image)
 Post.add_to_class('images', images)    
 Post.add_to_class('like_count', like_count)    
 Post.add_to_class('comment_count', comment_count)    
+
+
+class CommentFeedback(models.Model):
+    comment = models.ForeignKey(PostComment, models.CASCADE)
+    user = models.ForeignKey(User, models.CASCADE)
+    text = models.TextField()
+    rating = models.IntegerField(
+        validators=[
+            MaxValueValidator(10),
+            MinValueValidator(1)
+        ]
+     )
+
+    class Meta:
+        unique_together = ('comment', 'user')
+
 
 import posts.signals as post_signals
 
