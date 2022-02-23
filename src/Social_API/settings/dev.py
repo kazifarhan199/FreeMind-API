@@ -20,3 +20,5 @@ DATABASES = {
 
 # Email Provider
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+USE_MODEL = False
