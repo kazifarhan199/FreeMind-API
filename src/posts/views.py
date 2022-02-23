@@ -153,7 +153,7 @@ class PostCommentView(APIView):
 
 
 class CommentFeedbackView(APIView):
-    permission_classes = (IsAuthenticated, permissions.hasGroup_PostExists_UserBelongToPostGroup, )
+    permission_classes = (IsAuthenticated, )
 
     def post(self, request):
         data = request.data.copy()
