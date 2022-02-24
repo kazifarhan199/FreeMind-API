@@ -97,7 +97,7 @@ class CommentFeedback(models.Model):
     text = models.TextField()
     rating = models.IntegerField(
         validators=[
-            MaxValueValidator(10),
+            MaxValueValidator(5),
             MinValueValidator(1)
         ]
      )
