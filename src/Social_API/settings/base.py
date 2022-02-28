@@ -134,3 +134,7 @@ FIREBASE_PROJECT_KEY= 'AAAARVQhCgA:APA91bGemTw3miRbIQtYgIG1LbgG1Fxc7JkTPlZzP51d9
 
 MODELS_PATH = Path(BASE_DIR, 'models/best_model-roberta-base')
 MODEL_NAME = 'roberta'
+
+import os
+
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"

@@ -3,11 +3,15 @@ from groups.models import GroupsMember
 from django.contrib.auth import get_user_model
 from .models import PostComment
 from .utils import get_estimation
+import threading
 
 User = get_user_model()
 
-
 def postCreatedNotification(sender, instance, created, **kwargs):
+    start_time = threading.Timer(1, lambda : postCreatedNotification_threaded(sender, instance, created, **kwargs))
+    start_time.start()
+
+def postCreatedNotification_threaded(sender, instance, created, **kwargs):
     # Sending recommendation
     if created:
         text = get_estimation([instance.title, ])
