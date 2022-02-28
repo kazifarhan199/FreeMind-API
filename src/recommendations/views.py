@@ -15,7 +15,7 @@ class LabelsListView(ListAPIView):
     
     def get_queryset(self):
         queryset = models.Labels.objects.all()
-        return queryset
+        return queryset.order_by('?')[:15]
 
 class LabelsCreateView(CreateAPIView):
     serializer_class = serializers.LabelsSerializer
