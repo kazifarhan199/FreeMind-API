@@ -9,4 +9,5 @@ urlpatterns = [
     path('groups/', include('groups.urls')),
     path('posts/', include('posts.urls')),
     path('notifications/', include('notifications.urls')),
+    path('recommendations/', include('recommendations.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

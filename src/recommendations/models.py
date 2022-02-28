@@ -7,6 +7,14 @@ User = get_user_model()
 class Labels(models.Model):
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=100)
+    reason = models.TextField()
+    link = models.CharField(max_length=400)
+
+    def __str__(self):
+        return f'{self.name}, {self.type}'
+
+    class Meta:
+        unique_together = ('name', 'type', 'reason')
 
 class Ratings(models.Model):
     label = models.ForeignKey(Labels, models.CASCADE)
@@ -18,3 +26,8 @@ class Ratings(models.Model):
         ]
      )
 
+    def __str__(self):
+        return f'{self.label}, {self.user}'
+
+    class Meta:
+        unique_together = ('label', 'user')
