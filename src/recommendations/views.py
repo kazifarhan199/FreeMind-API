@@ -8,13 +8,23 @@ from posts.pagination import PostPageNumberPagination1000
 from . import serializers, models
 
 
+class QuestionsListView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = serializers.LabelsSerializer
+    pagination_class = PostPageNumberPagination1000
+    
+    def get_queryset(self):
+        queryset = models.Labels.objects.filter(is_label=False)
+        return queryset
+
+
 class LabelsListView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = serializers.LabelsSerializer
     pagination_class = PostPageNumberPagination1000
     
     def get_queryset(self):
-        queryset = models.Labels.objects.all()
+        queryset = models.Labels.objects.filter(is_label=True)
         return queryset.order_by('?')[:15]
 
 class LabelsCreateView(CreateAPIView):

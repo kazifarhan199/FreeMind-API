@@ -9,6 +9,7 @@ class Labels(models.Model):
     type = models.CharField(max_length=100)
     reason = models.TextField()
     link = models.CharField(max_length=400)
+    is_label = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.name}, {self.type}'
