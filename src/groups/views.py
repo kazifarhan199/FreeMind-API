@@ -37,7 +37,7 @@ class GroupsView(APIView):
         data = request.data.copy()
         data['user'] = request.user.id
         # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
-        serializer = self.serializer_class(data=data, instance=Groups.objects.filter(user=request.user).first() , context={'request': request})
+        serializer = self.serializer_class(data=data, instance=GroupsMember.objects.filter(user=request.user).first().group , context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
