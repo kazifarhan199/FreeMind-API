@@ -15,9 +15,13 @@ class PostCreateView(APIView):
     permission_classes = (IsAuthenticated, IsInGroup, )
 
     def post(self, request):
-        data = request.data.copy()
+        data = {}
+        data['image'] = request.data['images']
+        data['title'] = request.data['title']
+
         data['user'] = request.user.id
         data['group'] = GroupsMember.objects.filter(user=request.user).first().group.id
+        print(request.POST)
         serializer = serializers.PostSerializer(data=data, context={'request':request},)
         if serializer.is_valid():
             post = serializer.save()
