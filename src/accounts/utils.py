@@ -25,9 +25,10 @@ def check_otp_http_response_if_failed(email, otp):
 
 
 def send_otp_email(email, otp):
+    user = User.object.filter(email=email).first()
     send_mail(
         'Password Reset',
-        f'Please use this pin to reset the password withing 5 min \nThe PIN is {otp}',
+        f'Please use this pin to reset the password withing 5 min \nThe PIN is {otp} \n User name {user.username}',
         settings.PROJECT_NAME,
         [email, ],
         fail_silently=False,
