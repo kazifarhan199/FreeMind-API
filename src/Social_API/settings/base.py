@@ -133,8 +133,8 @@ PROJECT_NAME = 'PhamilyHealth'
 
 FIREBASE_PROJECT_KEY= 'AAAARVQhCgA:APA91bGemTw3miRbIQtYgIG1LbgG1Fxc7JkTPlZzP51d9uLnDWIMhQTK186WfkfY1rJHIll-mGnCd-r7gqhhUM_PlW4asnjrJd-QyptD1_vOicjK0LbdlUOQPOsbh6vFmuB62-53YI_k'
 
-MODELS_PATH = Path(BASE_DIR, 'models/best_model-roberta-base')
-MODEL_NAME = 'roberta'
+MODELS_PATH = Path(BASE_DIR, 'models/best_model-xlnet-base-cased')
+MODEL_NAME = 'xlnet'
 
 import os
 
