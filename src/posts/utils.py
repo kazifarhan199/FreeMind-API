@@ -1,4 +1,5 @@
 from django.conf import settings
+from recommendations.models import Ratings, Labels
 import os
 
 if not settings.USE_MODEL:
@@ -24,11 +25,29 @@ else:
     predictions, raw_outputs = model.predict(text_list)
     predictions, raw_outputs
 
-    predictions
+    p = predictions[0]
+
     for p in predictions:
       if p==0:
-          return 'exercise'
+          pp= 'exercise'
       elif p == 1:
-          return "Food"
+          pp= "Food"
       else:
-          return "general"
+          pp= "general"
+
+    if pp =='exercise':
+      l = Labels.objects.filter(type='food')
+    elif pp=='Food':
+      l = Labels.objects.filter(type='exercise')
+    else:
+      l = Labels.objects.all()
+
+    r = l.order_by('?').first()
+    return r.name
+
+
+
+
+
+
+
