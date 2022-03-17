@@ -4,7 +4,7 @@ import os
 
 if not settings.USE_MODEL:
   def get_estimation(text):
-    return text
+    return text, text
     
 else:
   from simpletransformers.classification import ClassificationModel, ClassificationArgs
@@ -43,7 +43,7 @@ else:
       l = Labels.objects.all()
 
     r = l.order_by('?').first()
-    return r.name
+    return r.name, r.reason
 
 
 
