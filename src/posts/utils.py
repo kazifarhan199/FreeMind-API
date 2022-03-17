@@ -26,9 +26,24 @@ else:
     predictions, raw_outputs
 
     p = predictions[0]
-    print(p)
 
-    return p, p
+    for p in predictions:
+      if p==0:
+          pp= 'exercise'
+      elif p == 1:
+          pp= "Food"
+      else:
+          pp= "general"
+
+    if pp =='exercise':
+      l = Labels.objects.filter(type='Food')
+    elif pp=='Food':
+      l = Labels.objects.filter(type='Exercise')
+    else:
+      l = Labels.objects.all()
+
+    r = l.order_by('?').first()
+    return r.name, r.reason
 
 
 
