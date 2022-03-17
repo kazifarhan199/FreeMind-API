@@ -1,9 +1,13 @@
 from django.conf import settings
 from recommendations.models import Ratings, Labels
+from surprise import KNNWithMeans
+import pandas as pd
+from surprise import Dataset
+from surprise import Reader
 import os
 
 if not settings.USE_MODEL:
-  def get_estimation(text):
+  def get_estimation(text, current_user_id):
     return text, text
     
 else:
@@ -20,7 +24,7 @@ else:
       settings.MODEL_NAME, settings.MODELS_PATH
   )
 
-  def get_estimation(text_list):
+  def get_estimation(text_list, current_user_id):
 
     predictions, raw_outputs = model.predict(text_list)
     predictions, raw_outputs
@@ -29,21 +33,53 @@ else:
 
     for p in predictions:
       if p==0:
-          pp= 'exercise'
+        pp= 'Exercise'
+        prefred_labels = Labels.objects.filter(type='Food')
+        other_labels = Labels.objects.except(type='Exercise')
       elif p == 1:
-          pp= "Food"
+        pp= "Food"
+        prefred_labels = Labels.objects.filter(type='Exercise')
+        other_labels = Labels.objects.except(type='Food')
       else:
-          pp= "general"
+        pp= "general"
+        prefred_labels = Labels.objects.all()
+        other_labels = []
 
-    if pp =='exercise':
-      l = Labels.objects.filter(type='Food')
-    elif pp=='Food':
-      l = Labels.objects.filter(type='Exercise')
-    else:
-      l = Labels.objects.all()
+    objects = Ratings.objects.all().order_by('id')
+    users = [i.user for i in objects]
+    ratings = [i.rating for i in objects]
+    labelss = [i.label.id for i in objects]
 
-    r = l.order_by('?').first()
-    return r.name, r.reason
+    df = pd.DataFrame(list(zip(users, labelss, ratings)), columns=['userId', 'labelsId', 'rating'])
+
+    reader = Reader(rating_scale=(1, 5))
+    # Loads Pandas dataframe
+    data = Dataset.load_from_df(df[["userId", "labelsId", "rating"]], reader)
+
+    # To use item-based cosine similarity
+    sim_options = {'sim_options': {'name': 'pearson_baseline', 'min_support': 1, 'user_based': False}}
+
+    algo = KNNWithMeans(sim_options=sim_options)
+
+    trainingSet = data.build_full_trainset()
+
+    algo.fit(trainingSet)
+
+    labels = Labels.objects.all()
+
+    scores = [(algo.predict(current_user_id, l.id).best_score["rmse"]*1.3, l.id) for l in prefred_labels]
+
+    scores2 = [(algo.predict(current_user_id, l.id).best_score["rmse"], l.id) for l in other_labels]
+
+    predictions = scores += scores2
+
+    predictions.sort(key=lambda x: x[0])
+
+    label_id = predictions[0]
+
+    label = Labels.objects.get(id=label_id)
+
+    return label.name, label.reason
 
 
 
