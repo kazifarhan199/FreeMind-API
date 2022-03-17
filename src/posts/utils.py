@@ -35,11 +35,11 @@ else:
       if p==0:
         pp= 'Exercise'
         prefred_labels = Labels.objects.filter(type='Food')
-        other_labels = Labels.objects.except(type='Exercise')
+        other_labels = Labels.objects.exclude(type='Exercise')
       elif p == 1:
         pp= "Food"
         prefred_labels = Labels.objects.filter(type='Exercise')
-        other_labels = Labels.objects.except(type='Food')
+        other_labels = Labels.objects.exclude(type='Food')
       else:
         pp= "general"
         prefred_labels = Labels.objects.all()
