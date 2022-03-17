@@ -71,7 +71,9 @@ else:
 
     scores2 = [(algo.predict(current_user_id, l.id).best_score["rmse"], l.id) for l in other_labels]
 
-    predictions = scores += scores2
+    scores += scores2
+    
+    predictions = scores
 
     predictions.sort(key=lambda x: x[0])
 
