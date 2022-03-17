@@ -8,6 +8,7 @@ from accounts.models import Device
 
 def sendNotifications(sender, instance, created, **kwargs):
     devices = Device.objects.filter(user=instance.user)
+    print(devices)
 
     if instance.seen:
         return 
@@ -16,28 +17,25 @@ def sendNotifications(sender, instance, created, **kwargs):
         data = {
                     "click_action":"FLUTTER_NOTIFICATION_CLICK",
                     "notification_id": instance.id,
-                    "for": "likes",
                     "title": instance.text, 
                     "body": "",
-                    "id": str(instance.post.id),
+                    "post": str(instance.post.id),
                 }
     elif instance.post_comment != None:
         data = {
                     "click_action":"FLUTTER_NOTIFICATION_CLICK",
                     "notification_id": instance.id,
-                    "for": "comment",
                     "title": instance.text, 
-                    "body": "",
-                    "id": str(instance.post.id),
+                    "body": instance.post_comment.text,
+                    "post": str(instance.post.id),
                 }
     elif instance.post != None:
         data = {
                     "click_action":"FLUTTER_NOTIFICATION_CLICK",
                     "notification_id": instance.id,
-                    "for": "home",
                     "title": instance.text, 
                     "body": instance.post.title,
-                    'id':str(instance.post.id),
+                    'post':str(instance.post.id),
                 }
 
     for d in devices:
@@ -56,6 +54,8 @@ def sendNotifications(sender, instance, created, **kwargs):
                 "Content-Type":"application/json"
             }
         )
+        
+
 
         if json.loads(re.text)['results'][0].get('error')=='NotRegistered':
             d.delete()

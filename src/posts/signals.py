@@ -3,12 +3,13 @@ from groups.models import GroupsMember
 from django.contrib.auth import get_user_model
 from .models import PostComment
 from .utils import get_estimation
+from django.conf import settings
 import threading
 
 User = get_user_model()
 
 def postCreatedNotification(sender, instance, created, **kwargs):
-    start_time = threading.Timer(1, lambda : postCreatedNotification_threaded(sender, instance, created, **kwargs))
+    start_time = threading.Timer(settings.BOT_ID, lambda : postCreatedNotification_threaded(sender, instance, created, **kwargs))
     start_time.start()
 
 def postCreatedNotification_threaded(sender, instance, created, **kwargs):
@@ -16,10 +17,10 @@ def postCreatedNotification_threaded(sender, instance, created, **kwargs):
     if created:
         text, reason = get_estimation([instance.title, ])
         # Ussing Bot user to send notifications
-        try:
-            PostComment.objects.create(user=User.objects.get(pk=4), post=instance, text=text+'\n'+reason, need_feadback=True)
-        except:
-            print("Fix the bot id !!!")
+        # try:
+        PostComment.objects.create(user=User.objects.get(pk=settings.BOT_ID), post=instance, text=f'{text}\n{reason}', need_feadback=True)
+        # except:
+        #     print("Fix the bot id !!!")
     # Sending notification
     if created:
         # If a new post is created 
