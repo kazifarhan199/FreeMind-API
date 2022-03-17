@@ -67,9 +67,9 @@ else:
 
     labels = Labels.objects.all()
 
-    scores = [(algo.predict(current_user_id, l.id).best_score["rmse"]*1.3, l.id) for l in prefred_labels]
+    scores = [(algo.predict(current_user_id, l.id).est*1.3, l.id) for l in prefred_labels]
 
-    scores2 = [(algo.predict(current_user_id, l.id).best_score["rmse"], l.id) for l in other_labels]
+    scores2 = [(algo.predict(current_user_id, l.id).est, l.id) for l in other_labels]
 
     scores += scores2
     
