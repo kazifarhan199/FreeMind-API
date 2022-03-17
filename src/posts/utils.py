@@ -79,7 +79,7 @@ else:
 
     label_id = predictions[0]
 
-    label = Labels.objects.get(id=label_id)
+    label = Labels.objects.get(id=label_id[1])
 
     return label.name, label.reason
 
