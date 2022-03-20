@@ -56,6 +56,7 @@ class PostComment(models.Model):
     post = models.ForeignKey(Post, models.CASCADE, related_name='comments')
     user = models.ForeignKey(User, models.CASCADE)
     text = models.TextField()
+    link = models.TextField(default='')
     need_feadback = models.BooleanField(default=False, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
 
