@@ -27,55 +27,51 @@ else:
   def get_estimation(text_list, current_user_id):
 
     predictions, raw_outputs = model.predict(text_list)
-    predictions, raw_outputs
+    print('Predictions are ', predictions)
 
-    p = predictions[0]
+    d = {0:'Exercise', 1:'Food', 2:'general', 3: 'Stress'}
+    pp = d.get(predictions[0])
+    print("The predicted catagory is", pp)
+    d_values = list(d.values())
 
-    for p in predictions:
-      if p==0:
-        pp= 'Exercise'
-        prefred_labels = Labels.objects.filter(type='Food')
-        other_labels = Labels.objects.exclude(type='Exercise')
-      elif p == 1:
-        pp= "Food"
-        prefred_labels = Labels.objects.filter(type='Exercise')
-        other_labels = Labels.objects.exclude(type='Food')
-      else:
-        pp= "general"
-        prefred_labels = Labels.objects.filter(is_label=True)
-        other_labels = []
+    if (pp=='Exercise'):
+      priority = Labels.objects.filter(type='Food', is_label=True)
+      others = Labels.objects.exclude(type='Food', is_label=True)
+    elif (pp=='Food'):
+      priority = Labels.objects.filter(type='Exercise', is_label=True)
+      others = Labels.objects.exclude(type='Exercise', is_label=True)
+    elif (pp=='Stress'):
+      priority = Labels.objects.filter(type='Stress', is_label=True)
+      others = Labels.objects.exclude(type='Stress', is_label=True)
+    else:
+      priority = []
+      others = Labels.objects.filter(is_label=True)
 
     objects = Ratings.objects.filter(is_label=True).order_by('id')
     users = [i.user for i in objects]
     ratings = [i.rating for i in objects]
     labelss = [i.label.id for i in objects]
-
     df = pd.DataFrame(list(zip(users, labelss, ratings)), columns=['userId', 'labelsId', 'rating'])
 
     reader = Reader(rating_scale=(1, 5))
-    # Loads Pandas dataframe
-    data = Dataset.load_from_df(df[["userId", "labelsId", "rating"]], reader)
-
-    # To use item-based cosine similarity
-    sim_options = {'sim_options': {'name': 'pearson_baseline', 'min_support': 1, 'user_based': False}}
-
-    algo = KNNWithMeans(sim_options=sim_options)
-
+    data = Dataset.load_from_df(dfd[["userId", "labelId", "rating"]], reader)
     trainingSet = data.build_full_trainset()
-
+    algo = NMF()
     algo.fit(trainingSet)
 
     labels = Labels.objects.all()
-
-    scores = [(algo.predict(current_user_id, l.id).est*1.3, l.id) for l in prefred_labels]
-
-    scores2 = [(algo.predict(current_user_id, l.id).est, l.id) for l in other_labels]
+    scores = [(algo.predict(current_user_id, l.id).est, l.id) for l in priority]
+    scores2 = [(algo.predict(current_user_id, l.id).est, l.id) for l in others]
 
     scores += scores2
+
+    print("Scores are ", scores)
     
     predictions = scores
 
-    predictions.sort(key=lambda x: x[0])
+    predictions.sort(key=lambda x: x[0],reverse=True)
+
+    print("Scores are ", scores)
 
     label_id = predictions[0]
 
