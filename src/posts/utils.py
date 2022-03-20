@@ -8,7 +8,7 @@ import os
 
 if not settings.USE_MODEL:
   def get_estimation(text, current_user_id):
-    return text, text
+    return Labels.objects.all().first()
     
 else:
   from simpletransformers.classification import ClassificationModel, ClassificationArgs
@@ -81,7 +81,7 @@ else:
 
     label = Labels.objects.get(id=label_id[1])
 
-    return label.name, label.reason
+    return label
 
 
 

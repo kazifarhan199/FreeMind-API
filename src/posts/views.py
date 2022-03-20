@@ -17,6 +17,8 @@ class PostCreateView(APIView):
     def post(self, request):
         data = {}
         data['image'] = request.data['images']
+        if (not request.data.get('title')):
+            return Response({'title': ['Title is required', ]}, status=status.HTTP_400_BAD_REQUEST)
         data['title'] = request.data['title']
 
         data['user'] = request.user.id
