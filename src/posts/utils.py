@@ -54,7 +54,7 @@ else:
     df = pd.DataFrame(list(zip(users, labelss, ratings)), columns=['userId', 'labelsId', 'rating'])
 
     reader = Reader(rating_scale=(1, 5))
-    data = Dataset.load_from_df(df[["userId", "labelId", "rating"]], reader)
+    data = Dataset.load_from_df(df[["userId", "labelsId", "rating"]], reader)
     trainingSet = data.build_full_trainset()
     algo = NMF()
     algo.fit(trainingSet)
