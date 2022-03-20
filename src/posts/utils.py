@@ -42,7 +42,7 @@ else:
         other_labels = Labels.objects.exclude(type='Food')
       else:
         pp= "general"
-        prefred_labels = Labels.objects.all()
+        prefred_labels = Labels.objects.filter(is_label=True)
         other_labels = []
 
     objects = Ratings.objects.filter(is_label=True).order_by('id')
