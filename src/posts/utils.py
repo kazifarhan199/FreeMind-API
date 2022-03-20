@@ -5,6 +5,7 @@ import pandas as pd
 from surprise import Dataset
 from surprise import Reader
 import os
+import random
 
 if not settings.USE_MODEL:
   def get_estimation(text, current_user_id):
@@ -74,7 +75,7 @@ else:
 
     print("Scores are ", scores)
 
-    label_id = predictions[0]
+    label_id = predictions[:10][random.randrange(1, 11)]
 
     label = Labels.objects.get(id=label_id[1])
 
