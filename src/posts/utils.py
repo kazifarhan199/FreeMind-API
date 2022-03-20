@@ -48,7 +48,7 @@ else:
       others = Labels.objects.filter(is_label=True)
 
     objects = Ratings.objects.filter(is_label=True).order_by('id')
-    users = [i.user for i in objects]
+    users = [i.user.id for i in objects]
     ratings = [i.rating for i in objects]
     labelss = [i.label.id for i in objects]
     df = pd.DataFrame(list(zip(users, labelss, ratings)), columns=['userId', 'labelsId', 'rating'])
