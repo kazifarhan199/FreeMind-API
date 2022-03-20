@@ -26,6 +26,7 @@ class Ratings(models.Model):
             MinValueValidator(1)
         ]
      )
+    is_label = models.BooleanField(default=True) 
 
     def __str__(self):
         return f'{self.label}, {self.user}'

@@ -45,7 +45,7 @@ else:
         prefred_labels = Labels.objects.all()
         other_labels = []
 
-    objects = Ratings.objects.all().order_by('id')
+    objects = Ratings.objects.filter(is_label=True).order_by('id')
     users = [i.user for i in objects]
     ratings = [i.rating for i in objects]
     labelss = [i.label.id for i in objects]
