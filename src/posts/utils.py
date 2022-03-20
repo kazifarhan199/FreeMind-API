@@ -54,7 +54,7 @@ else:
     df = pd.DataFrame(list(zip(users, labelss, ratings)), columns=['userId', 'labelsId', 'rating'])
 
     reader = Reader(rating_scale=(1, 5))
-    data = Dataset.load_from_df(dfd[["userId", "labelId", "rating"]], reader)
+    data = Dataset.load_from_df(df[["userId", "labelId", "rating"]], reader)
     trainingSet = data.build_full_trainset()
     algo = NMF()
     algo.fit(trainingSet)
@@ -62,6 +62,7 @@ else:
     labels = Labels.objects.all()
     scores = [(algo.predict(current_user_id, l.id).est*1.3, l.id) for l in priority]
     scores2 = [(algo.predict(current_user_id, l.id).est, l.id) for l in others]
+
 
     scores += scores2
 
