@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+from posts.models import PostComment
+
 User = get_user_model()
 
 class Labels(models.Model):
@@ -33,3 +35,10 @@ class Ratings(models.Model):
 
     class Meta:
         unique_together = ('label', 'user')
+
+class Tracker(models.Model):
+    label = models.ForeignKey(Labels, models.CASCADE)
+    nlp_classification = models.TextField(max_length=100)
+    recommendation_tree = models.TextField()
+    comment = models.ForeignKey(PostComment, models.CASCADE)
+

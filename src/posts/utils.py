@@ -9,7 +9,7 @@ import random
 
 if not settings.USE_MODEL:
   def get_estimation(text, current_user):
-    return Labels.objects.all().first()
+    return Labels.objects.all().first(), "NLP_model_prediction", ["This is just a demo"]
     
 else:
   from simpletransformers.classification import ClassificationModel, ClassificationArgs
@@ -31,17 +31,17 @@ else:
     print('Predictions are ', predictions)
 
     d = {0:'Exercise', 1:'Food', 2:'general', 3: 'Stress'}
-    pp = d.get(predictions[0])
-    print("The predicted catagory is", pp)
+    NLP_model_prediction = d.get(predictions[0])
+    print("The predicted catagory is", NLP_model_prediction)
     d_values = list(d.values())
 
-    if (pp=='Exercise'):
+    if (NLP_model_prediction=='Exercise'):
       priority = Labels.objects.filter(type='Food', is_label=True)
       others = Labels.objects.exclude(type='Food', is_label=True)
-    elif (pp=='Food'):
+    elif (NLP_model_prediction=='Food'):
       priority = Labels.objects.filter(type='Exercise', is_label=True)
       others = Labels.objects.exclude(type='Exercise', is_label=True)
-    elif (pp=='Stress'):
+    elif (NLP_model_prediction=='Stress'):
       priority = Labels.objects.filter(type='Stress', is_label=True)
       others = Labels.objects.exclude(type='Stress', is_label=True)
     else:
@@ -79,7 +79,7 @@ else:
 
     label = Labels.objects.get(id=label_id[1])
 
-    return label
+    return label, NLP_model_prediction, scores
 
 
 

@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from .models import PostComment
 from .utils import get_estimation
 from django.conf import settings
+from recommendations.models import Tracker
 import threading
 
 User = get_user_model()
@@ -15,10 +16,11 @@ def postCreatedNotification(sender, instance, created, **kwargs):
 def postCreatedNotification_threaded(sender, instance, created, **kwargs):
     # Sending recommendation
     if created:
-        label = get_estimation([instance.title, ], instance.user)
+        label, NLP_model_prediction, scores = get_estimation([instance.title, ], instance.user)
         # Ussing Bot user to send notifications
         # try:
-        PostComment.objects.create(user=User.objects.get(pk=settings.BOT_ID), post=instance, text=label.reason, need_feadback=True, link=label.link)
+        c = PostComment.objects.create(user=User.objects.get(pk=settings.BOT_ID), post=instance, text=label.reason, need_feadback=True, link=label.link)
+        Tracker(label=label, nlp_classification=NLP_model_prediction, recommendation_tree=scores, comment=c)
         # except:
         #     print("Fix the bot id !!!")
     # Sending notification
