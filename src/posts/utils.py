@@ -8,7 +8,7 @@ import os
 import random
 
 if not settings.USE_MODEL:
-  def get_estimation(text, current_user_id):
+  def get_estimation(text, current_user):
     return Labels.objects.all().first()
     
 else:
@@ -25,7 +25,7 @@ else:
       settings.MODEL_NAME, settings.MODELS_PATH
   )
 
-  def get_estimation(text_list, current_user_id):
+  def get_estimation(text_list, current_user):
 
     predictions, raw_outputs = model.predict(text_list)
     print('Predictions are ', predictions)
@@ -61,8 +61,8 @@ else:
     algo.fit(trainingSet)
 
     labels = Labels.objects.all()
-    scores = [(algo.predict(current_user_id, l.id).est*1.3, l.id) for l in priority]
-    scores2 = [(algo.predict(current_user_id, l.id).est, l.id) for l in others]
+    scores = [(algo.predict(current_user.id, l.id).est*1.3, l.id) for l in priority]
+    scores2 = [(algo.predict(current_user.id, l.id).est, l.id) for l in others]
 
 
     scores += scores2
