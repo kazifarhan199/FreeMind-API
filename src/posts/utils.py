@@ -75,7 +75,7 @@ else:
 
     print("Scores are ", scores)
 
-    label_id = predictions[:10][random.randrange(1, 11)]
+    label_id = predictions[:10][random.randrange(1, 10)]
 
     label = Labels.objects.get(id=label_id[1])
 
