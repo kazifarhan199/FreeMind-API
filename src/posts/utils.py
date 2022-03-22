@@ -61,9 +61,8 @@ else:
     algo.fit(trainingSet)
 
     labels = Labels.objects.all()
-    scores = [(algo.predict(current_user.id, l.id).est*1.3, l.id) for l in priority]
-    scores2 = [(algo.predict(current_user.id, l.id).est, l.id) for l in others]
-
+    scores = [(round(algo.predict(current_user.id, l.id).est, 2)*1.3, l.id) for l in priority]
+    scores2 = [(round(algo.predict(current_user.id, l.id).est, 2), l.id) for l in others]
 
     scores += scores2
 
