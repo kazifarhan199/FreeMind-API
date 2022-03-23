@@ -14,7 +14,7 @@ class QuestionsListView(ListAPIView):
     pagination_class = PostPageNumberPagination1000
     
     def get_queryset(self):
-        queryset = models.Labels.objects.filter(is_label=False)
+        queryset = models.Labels.objects.filter(is_label=False, is_coupuled=False)
         return queryset
 
 class QuestionsCopuledListView(ListAPIView):
