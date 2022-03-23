@@ -17,6 +17,15 @@ class QuestionsListView(ListAPIView):
         queryset = models.Labels.objects.filter(is_label=False)
         return queryset
 
+class QuestionsCopuledListView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = serializers.LabelsSerializer
+    pagination_class = PostPageNumberPagination1000
+    
+    def get_queryset(self):
+        queryset = models.Labels.objects.filter(is_label=False, is_coupuled=True)
+        return queryset
+
 
 class LabelsListView(ListAPIView):
     permission_classes = (IsAuthenticated, )

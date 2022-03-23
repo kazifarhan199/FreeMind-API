@@ -7,11 +7,12 @@ from posts.models import PostComment
 User = get_user_model()
 
 class Labels(models.Model):
-    name = models.CharField(max_length=100)
-    type = models.CharField(max_length=100)
+    name = models.CharField(max_length=400)
+    type = models.CharField(max_length=200)
     reason = models.TextField()
     link = models.CharField(max_length=400)
     is_label = models.BooleanField(default=True)
+    is_coupuled = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.name}, {self.type}'
