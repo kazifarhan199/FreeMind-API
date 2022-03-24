@@ -139,4 +139,4 @@ MODEL_NAME = 'xlnet'
 import os
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
-BOT_ID = 2
+BOT_ID = 4
