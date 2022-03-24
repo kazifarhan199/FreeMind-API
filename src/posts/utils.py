@@ -92,7 +92,7 @@ def get_label_type_questiosn_scores_recommendation(current_user, ):
 
     objects = Ratings.objects.filter(is_label=False).order_by('id')
     users = [i.user.id for i in objects]
-    ratings = [6-i.rating if i.label.is_coupuled==False else i.rating for i in objects]
+    ratings = [(6-i.rating)/3 if i.label.is_coupuled==False else i.rating for i in objects]
     labels = [i.label.id for i in objects]
     df = pd.DataFrame(list(zip(users, labels, ratings)), columns=['userId', 'labelsId', 'rating'])
 
