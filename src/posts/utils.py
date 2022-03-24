@@ -6,6 +6,7 @@ from surprise import Dataset
 from surprise import Reader
 import os
 import random
+from copy import deepcopy
 
 if not settings.USE_MODEL:
   def get_estimation(text, current_user):
@@ -41,7 +42,7 @@ else:
     label_scores = get_label_scores_recommendation(current_user, all_labels) # tuple(predict rating, label object)
     label_type_scores = get_label_type_questiosn_scores_recommendation(current_user) # tuple(predict rating, label object)
     
-    new_label_scores = label_scores.copy()
+    new_label_scores = deepcopy(label_scores)
 
     for typelabel_score in label_type_scores:
 
