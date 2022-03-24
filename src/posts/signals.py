@@ -16,11 +16,11 @@ def postCreatedNotification(sender, instance, created, **kwargs):
 def postCreatedNotification_threaded(sender, instance, created, **kwargs):
     # Sending recommendation
     if created:
-        label, NLP_model_prediction, scores = get_estimation([instance.title, ], instance.user)
+        label, NLP_model_prediction, label_scores, label_type_scores, scores = get_estimation([instance.title, ], instance.user)
         # Ussing Bot user to send notifications
         # try:
         c = PostComment.objects.create(user=User.objects.get(pk=settings.BOT_ID), post=instance, text=label.reason, need_feadback=True, link=label.link)
-        Tracker.objects.create(user=instance.user, label=label, nlp_classification=NLP_model_prediction, recommendation_tree=scores, comment=c)
+        Tracker.objects.create(user=instance.user, label=label, nlp_classification=NLP_model_prediction, recommendation_tree=scores, comment=c, labelType_scores=label_type_scores, label_scores=label_scores)
         # except:
         #     print("Fix the bot id !!!")
     # Sending notification

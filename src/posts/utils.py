@@ -41,29 +41,30 @@ else:
     label_scores = get_label_scores_recommendation(current_user, all_labels) # tuple(predict rating, label object)
     label_type_scores = get_label_type_questiosn_scores_recommendation(current_user) # tuple(predict rating, label object)
     
-    print(label_scores)
+    new_label_scores = label_scores
+
     for typelabel_score in label_type_scores:
 
-      for index in range(len(label_scores)):
+      for index in range(len(new_label_scores)):
       
-        if (label_scores[index][-1].type == typelabel_score[-1].type):
+        if (new_label_scores[index][-1].type == typelabel_score[-1].type):
 
-          label_scores[index][0] = label_scores[index][0] + typelabel_score[0]
+          new_label_scores[index][0] = new_label_scores[index][0] + typelabel_score[0]
         
         elif(len(typelabel_score[-1].type.split('-')) == 2 and label_scores[index][-1].type == typelabel_score[-1].type.split('-')[1] and typelabel_score[-1].type.split('-')[0]==NLP_model_prediction):
-          label_scores[index][0] = label_scores[index][0] + typelabel_score[0]
+          new_label_scores[index][0] = new_label_scores[index][0] + typelabel_score[0]
 
 
-    label_scores.sort(key=lambda x: x[0],reverse=True)
-    label_id = label_scores[:10 if len(label_scores)>10 else len(label_scores)][random.randrange(1, 10 if len(label_scores)>10 else len(label_scores))]
+    new_label_scores.sort(key=lambda x: x[0],reverse=True)
+    label_id = new_label_scores[:10 if len(new_label_scores)>10 else len(new_label_scores)][random.randrange(1, 10 if len(new_label_scores)>10 else len(new_label_scores))]
 
     label = Labels.objects.get(id=label_id[1].id)
 
-    scores = [(ls[0], ls[1].id, ls[1].name) for ls in label_scores]
+    label_scores = [(ls[0], ls[1].id, ls[1].name) for ls in label_scores]
+    label_type_scores = [(ls[0], ls[1].id, ls[1].name) for ls in label_type_scores]
+    new_label_scores = [(ls[0], ls[1].id, ls[1].name) for ls in new_label_scores]
 
-    print(scores)
-
-    return label, NLP_model_prediction, scores
+    return label, NLP_model_prediction, label_scores, label_type_scores, new_label_scores
 
 
 
@@ -87,9 +88,10 @@ def get_label_scores_recommendation(current_user, all_labels):
     return scores
 
 def get_label_type_questiosn_scores_recommendation(current_user, ):
+
     objects = Ratings.objects.filter(is_label=False).order_by('id')
     users = [i.user.id for i in objects]
-    ratings = [(6-i.rating)/3 for i in objects]
+    ratings = [6-i.rating for i in objects]
     labels = [i.label.id for i in objects]
     df = pd.DataFrame(list(zip(users, labels, ratings)), columns=['userId', 'labelsId', 'rating'])
 
