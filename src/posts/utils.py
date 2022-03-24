@@ -1,5 +1,5 @@
 from django.conf import settings
-from recommendations.models import Ratings, Labels
+from recommendations.models import Ratings, Labels, Tracker
 from surprise import NMF
 import pandas as pd
 from surprise import Dataset
@@ -35,8 +35,10 @@ else:
     print("The predicted catagory is", NLP_model_prediction)
     d_values = list(d.values())
 
+    showed_label = [t.label.id for t in Tracker.objects.filter(user=current_user).order_by('-id')][:10 if len(Tracker.objects.filter(user=current_user))>10 else len(Tracker.objects.filter(user=current_user))]
+    all_labels = Labels.objects.filter(is_label=True).exclude(id__in=showed_label)
 
-    label_scores = get_label_scores_recommendation(current_user) # tuple(predict rating, label object)
+    label_scores = get_label_scores_recommendation(current_user, all_labels) # tuple(predict rating, label object)
     label_type_scores = get_label_type_questiosn_scores_recommendation(current_user) # tuple(predict rating, label object)
     
     print(label_scores)
@@ -53,11 +55,11 @@ else:
 
 
     label_scores.sort(key=lambda x: x[0],reverse=True)
-    label_id = label_scores[:10][random.randrange(1, 10)]
+    label_id = label_scores[:10 if len(label_scores)>10 else len(label_scores)][random.randrange(1, 10 if len(label_scores)>10 else len(label_scores))]
 
     label = Labels.objects.get(id=label_id[1].id)
 
-    scores = [(ls[0], ls[1].id) for ls in label_scores]
+    scores = [(ls[0], ls[1].id, ls[1].name) for ls in label_scores]
 
     print(scores)
 
@@ -65,7 +67,7 @@ else:
 
 
 
-def get_label_scores_recommendation(current_user, ):
+def get_label_scores_recommendation(current_user, all_labels):
     objects = Ratings.objects.filter(is_label=True).order_by('id')
     
     users = [i.user.id for i in objects]
@@ -79,7 +81,6 @@ def get_label_scores_recommendation(current_user, ):
     algo = NMF()
     algo.fit(trainingSet)
 
-    all_labels = Labels.objects.filter(is_label=True)
     scores = [list((round(algo.predict(current_user.id, l.id).est, 2), l)) for l in all_labels]
     scores.sort(key=lambda x: x[0],reverse=True)
 
