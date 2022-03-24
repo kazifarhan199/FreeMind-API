@@ -38,6 +38,7 @@ class Ratings(models.Model):
         unique_together = ('label', 'user')
 
 class Tracker(models.Model):
+    user = models.ForeignKey(User, models.CASCADE)
     label = models.ForeignKey(Labels, models.CASCADE)
     nlp_classification = models.TextField(max_length=100)
     recommendation_tree = models.TextField()
