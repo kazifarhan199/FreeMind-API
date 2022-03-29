@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from posts.models import PostComment
@@ -7,7 +7,7 @@ from posts.models import PostComment
 User = get_user_model()
 
 class Labels(models.Model):
-    name = models.CharField(max_length=400)
+    name = models.TextField()
     type = models.CharField(max_length=200)
     reason = models.TextField()
     link = models.CharField(max_length=400)
