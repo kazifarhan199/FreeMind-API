@@ -130,7 +130,7 @@ class PostCommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PostComment
-        fields = ["id", "text", "created_on", "need_feadback", "username", "userimage", 'post', 'link']
+        fields = ["id", "text", "created_on", "need_feadback", "username", "userimage", 'post', 'link', 'is_bot']
 
 
     def is_valid(self):

@@ -55,6 +55,7 @@ class PostLike(models.Model):
 class PostComment(models.Model):
     post = models.ForeignKey(Post, models.CASCADE, related_name='comments')
     user = models.ForeignKey(User, models.CASCADE)
+    is_bot = models.BooleanField(default=False, blank=True)
     text = models.TextField()
     link = models.TextField(default='')
     need_feadback = models.BooleanField(default=False, blank=True)
