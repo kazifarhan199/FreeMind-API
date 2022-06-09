@@ -30,6 +30,14 @@ class PostCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class ProfilePostListView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = serializers.PostSerializer
+    pagination_class = PostPageNumberPagination
+    
+    def get_queryset(self):
+        queryset = Post.objects.filter(user=self.request.user)
+        return queryset.order_by('-created_on')
 
 class PostListView(ListAPIView):
     permission_classes = (IsAuthenticated, IsInGroup, )
