@@ -109,10 +109,10 @@ class PostLikeSerializer(serializers.ModelSerializer):
         valid_data['user'] = request.user
 
         # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
-        group = GroupsMember.objects.filter(user=request.user).first().group.id
+        groups = [g.id for g in GroupsMember.objects.filter(user=request.user).group]
         post_group = Post.objects.get(pk=valid_data['post'].id).group.id
 
-        if not group == post_group:
+        if not post_group in groups:
             """User who is add is not in group"""
             raise serializers.ValidationError({"group": ["Access denied."]})
         return super().validate(valid_data)
@@ -147,10 +147,10 @@ class PostCommentSerializer(serializers.ModelSerializer):
         valid_data['user'] = request.user
 
         # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
-        group = GroupsMember.objects.filter(user=request.user).first().group.id
+        groups = [g.id for g in GroupsMember.objects.filter(user=request.user).group]
         post_group = Post.objects.get(pk=valid_data['post'].id).group.id
 
-        if not group == post_group:
+        if not post_group in groups:
             """User who is add is not in group"""
             raise serializers.ValidationError({"group": ["Access denied."]})
         return super().validate(valid_data)
