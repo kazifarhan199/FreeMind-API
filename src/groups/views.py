@@ -112,7 +112,7 @@ class GroupsChannelView(APIView):
             try:
                 channel = Groups.objects.get(id=request.data['group'], gtype='Channel')
                 GroupsMember.objects.create(user=request.user, group=channel)
-                return Response({'detail': ['User Added']}, status=status.HTTP_200_OK)
+                return Response({'detail': ['User Added']}, status=status.HTTP_201_CREATED)
             except:
                 return Response({'detail': ['Unable to add user to group please contact admin']}, status=status.HTTP_404_NOT_FOUND)
 
@@ -123,7 +123,7 @@ class GroupsChannelView(APIView):
             try:
                 channel = Groups.objects.get(id=request.data['group'], gtype='Channel')
                 GroupsMember.objects.get(user=request.user, group=channel).delete()
-                return Response({'detail': ['User Removed']}, status=status.HTTP_200_OK)
+                return Response({'detail': ['User Removed']}, status=status.HTTP_202_ACCEPTED)
             except:
                 return Response({'detail': ['Unable to remove user to group please contact admin']}, status=status.HTTP_404_NOT_FOUND)
         else:
