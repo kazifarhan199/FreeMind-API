@@ -127,4 +127,4 @@ class GroupsChannelView(APIView):
             except:
                 return Response({'detail': ['Unable to remove user to group please contact admin']}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({'detail': ['User already following channel']}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': ['User already removed from channel']}, status=status.HTTP_404_NOT_FOUND)
