@@ -84,8 +84,7 @@ class GroupsSerializer(serializers.ModelSerializer):
         fields = ["id", "group_name", 'isin']
 
     def isIn(self, obj):
-        request = self.context.get('request', None)
-        user = request.user
+        user = self.context.get('request', None).user
         if GroupsMember.objects.filter(group=obj, user=user).exists():
             return True
         else:

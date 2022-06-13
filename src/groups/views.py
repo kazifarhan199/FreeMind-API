@@ -31,7 +31,7 @@ class GroupsView(APIView):
     def get(self, request):
         # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
         group = GroupsMember.objects.filter(user=request.user).first().group
-        serializer = self.serializer_class(group)
+        serializer = self.serializer_class(group, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request):
@@ -95,17 +95,13 @@ class GroupsMemberView(APIView):
         return Response({'detail': ['User removed from the group']}, status=status.HTTP_202_ACCEPTED)
 
 
-class GroupsChannelListView(ListAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = serializers.GroupsSerializer
-    
-    def get_queryset(self):
-        queryset = Groups.objects.filter(
-                gtype='Channel'
-            )
-        return queryset.order_by('-id')
-        
-class GroupsChannelAddUserView(APIView):
+class GroupsChannelView(APIView):
+
+    def get(self, request):
+        # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
+        groups = Groups.objects.filter(gtype='Channel')
+        serializer = serializers.GroupsSerializer(groups, context={'request': request}, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         if not Groups.objects.filter(id=request.data['group'], gtype='Channel').exists():
