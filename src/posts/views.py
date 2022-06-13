@@ -116,7 +116,7 @@ class PostLikeView(APIView):
             user=request.user, 
             post=Post.objects.get(
                 pk=request.data.get('post'), 
-                group=GroupsMember.objects.filter(user=request.user).first().group
+                group_id__in=[g.group.id for g in GroupsMember.objects.filter(user=request.user)]
             )
         ).delete()
         return Response({'detail': ["like removed.", ]}, status=status.HTTP_202_ACCEPTED)
