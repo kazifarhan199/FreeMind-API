@@ -101,7 +101,7 @@ class GroupsChannelView(APIView):
         # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
         groups = Groups.objects.filter(gtype='Channel')
         serializer = serializers.GroupsSerializer(groups, context={'request': request}, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'results':serializer.data}, status=status.HTTP_200_OK)
 
     def post(self, request):
         if not Groups.objects.filter(id=request.data['group'], gtype='Channel').exists():
