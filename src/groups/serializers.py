@@ -73,3 +73,20 @@ class GroupsSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"email": ["You are already in a group, please leave the group first."]})
             raise serializers.ValidationError({"user": ["The user is already in a group."]})
         return super().create(valid_data)
+
+
+
+class GroupsSerializer(serializers.ModelSerializer):
+    isin = serializers.SerializerMethodField('isIn')
+
+    class Meta:
+        model = Groups
+        fields = ["id", "group_name", 'isin']
+
+    def isIn(self, obj):
+        request = self.context.get('request', None)
+        user = request.user
+        if GroupsMember.objects.filter(group=obj, user=user).exists():
+            return True
+        else:
+            return False

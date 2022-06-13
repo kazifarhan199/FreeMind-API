@@ -45,7 +45,7 @@ class PostListView(ListAPIView):
     pagination_class = PostPageNumberPagination
     
     def get_queryset(self):
-        queryset = Post.objects.filter(group=GroupsMember.objects.filter(user=self.request.user).first().group)
+        queryset = Post.objects.filter(group__id__in=[i.group.id for i in GroupsMember.objects.filter(user=self.request.user)])
         return queryset.order_by('-created_on')
 
 

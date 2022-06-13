@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
+from rest_framework.generics import ListAPIView, CreateAPIView
 
 from accounts.serializers import UserSerializer
 from .models import Groups, GroupsMember, User
@@ -63,7 +64,7 @@ class GroupsMemberView(APIView):
 
 
 
-    def post(self, request):
+    def post(self, request): 
         serializer = serializers.GroupsMemberSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
@@ -94,4 +95,40 @@ class GroupsMemberView(APIView):
         return Response({'detail': ['User removed from the group']}, status=status.HTTP_202_ACCEPTED)
 
 
+class GroupsChannelListView(ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.GroupsSerializer
+    
+    def get_queryset(self):
+        queryset = Groups.objects.filter(
+                gtype='Channel'
+            )
+        return queryset.order_by('-id')
         
+class GroupsChannelAddUserView(APIView):
+
+    def post(self, request):
+        if not Groups.objects.filter(id=request.data['group'], gtype='Channel').exists():
+            return Response({'detail': ['Channel not found']}, status=status.HTTP_404_NOT_FOUND) 
+        elif (GroupsMember.objects.filter(group=Groups.objects.get(id=request.data['group'], gtype='Channel'), user=request.user)).exists():
+            return Response({'detail': ['User already following channel']}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            try:
+                channel = Groups.objects.get(id=request.data['group'], gtype='Channel')
+                GroupsMember.objects.create(user=request.user, group=channel)
+                return Response({'detail': ['User Added']}, status=status.HTTP_200_OK)
+            except:
+                return Response({'detail': ['Unable to add user to group please contact admin']}, status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request):
+        if not Groups.objects.filter(id=request.data['group'], gtype='Channel').exists():
+            return Response({'detail': ['Channel not found']}, status=status.HTTP_404_NOT_FOUND) 
+        elif (GroupsMember.objects.filter(group=Groups.objects.get(id=request.data['group'], gtype='Channel'), user=request.user)).exists():
+            try:
+                channel = Groups.objects.get(id=request.data['group'], gtype='Channel')
+                GroupsMember.objects.get(user=request.user, group=channel).delete()
+                return Response({'detail': ['User Removed']}, status=status.HTTP_200_OK)
+            except:
+                return Response({'detail': ['Unable to remove user to group please contact admin']}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'detail': ['User already following channel']}, status=status.HTTP_404_NOT_FOUND)
