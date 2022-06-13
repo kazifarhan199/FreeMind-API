@@ -147,7 +147,7 @@ class PostCommentSerializer(serializers.ModelSerializer):
         valid_data['user'] = request.user
 
         # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
-        groups = [g.id for g in GroupsMember.objects.filter(user=request.user).group]
+        groups = [g.group.id for g in GroupsMember.objects.filter(user=request.user)]
         post_group = Post.objects.get(pk=valid_data['post'].id).group.id
 
         if not post_group in groups:
