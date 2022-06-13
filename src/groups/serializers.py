@@ -60,10 +60,18 @@ class GroupsMemberSerializer(serializers.ModelSerializer):
 class GroupsSerializer(serializers.ModelSerializer):
     members = GroupsMemberSerializer(many=True, read_only=True)
     group_name = serializers.CharField()
+    isin = serializers.SerializerMethodField('isIn')
 
     class Meta:
         model = Groups
-        fields = ('group_name', 'members', 'user', 'id', )
+        fields = ('group_name', 'members', 'user', 'id', 'isin')
+
+    def isIn(self, obj):
+        user = self.context.get('request', None).user
+        if GroupsMember.objects.filter(group=obj, user=user).exists():
+            return True
+        else:
+            return False
 
     def create(self, valid_data):
         instance_user = self.context['request'].user
@@ -75,17 +83,3 @@ class GroupsSerializer(serializers.ModelSerializer):
         return super().create(valid_data)
 
 
-
-class GroupsSerializer(serializers.ModelSerializer):
-    isin = serializers.SerializerMethodField('isIn')
-
-    class Meta:
-        model = Groups
-        fields = ["id", "group_name", 'isin']
-
-    def isIn(self, obj):
-        user = self.context.get('request', None).user
-        if GroupsMember.objects.filter(group=obj, user=user).exists():
-            return True
-        else:
-            return False
