@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from groups.models import GroupsMember
+from groups.models import GroupsMember, Groups
 from groups.permissions import IsInGroup
 from .pagination import PostPageNumberPagination, PostPageNumberPagination1000
 from .models import Post, PostComment, PostLike
