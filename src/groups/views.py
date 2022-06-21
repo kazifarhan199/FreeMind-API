@@ -96,7 +96,7 @@ class GroupsMemberView(APIView):
         if not GroupsMember.objects.filter(user=user, group=instance_usergroup).exists():
           return Response({"email": ["User with this email does not exists in the group."]}, status=status.HTTP_400_BAD_REQUEST)
 
-        GroupsMember.objects.filter(user=user).delete()
+        GroupsMember.objects.filter(user=user, group__id=request.data.get('group')).delete()
         return Response({'detail': ['User removed from the group']}, status=status.HTTP_202_ACCEPTED)
 
 
