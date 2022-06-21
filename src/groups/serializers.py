@@ -17,7 +17,15 @@ class GroupsMemberSerializer(serializers.ModelSerializer):
         
 
     def validate(self, valid_data):
-        user=User.objects.get(email=self.context['request'].data.get('email'))
+        user = None
+        if User.objects.filter(email=self.context['request'].data.get('email')).exists():
+            user=User.objects.get(email=self.context['request'].data.get('email'))
+    
+        if User.objects.filter(username=self.context['request'].data.get('email')).exists():
+            user=User.objects.get(username=self.context['request'].data.get('email'))
+        if user == None:
+            raise serializers.ValidationError({"user": ["User not found."]})
+
         valid_data['user'] = user
 
         email = self.context['request'].data.get('email')
@@ -30,8 +38,15 @@ class GroupsMemberSerializer(serializers.ModelSerializer):
 
         if not email:
             raise serializers.ValidationError({"email": ["This field is required."]})
+        
+        user = None
         if not User.objects.filter(email=email).exists():
-            raise serializers.ValidationError({"email": ["User with this email does not exists."]})
+            if not User.objects.filter(username=email).exists():
+                raise serializers.ValidationError({"email/username": ["User with this email does not exists."]})
+            else:
+                user = User.objects.get(username=email)
+        else:
+            user = User.objects.get(email=email)
 
         if not Groups.objects.filter(pk=group).exists():
             """Group does not exists"""
@@ -41,8 +56,8 @@ class GroupsMemberSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"group": ["Access denied."]})
 
         # Not allowing user to be added to multiple groups, just disable (SINGLEUSERCONSTRAINT)
-        if GroupsMember.objects.filter(user=User.objects.get(email=email)).exists():
-            if User.objects.get(email=email) == instance_user:
+        if GroupsMember.objects.filter(user=user).exists():
+            if user == instance_user:
                 raise serializers.ValidationError({"email": ["You are already in a group, please leave the group first."]})
             raise serializers.ValidationError({"email": ["User already in a group."]})
         #

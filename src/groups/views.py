@@ -54,6 +54,11 @@ class GroupsMemberView(APIView):
         if not email:
             return Response({"email": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
 
+        if User.objects.filter(username=email).exists():
+            email = User.objects.get(username=email).email
+        print(email)
+
+
         if GroupsMember.objects.filter(user__email=email).exists():
             return Response({'detail': ['User unavailable']}, status=status.HTTP_404_NOT_FOUND)
         else:
