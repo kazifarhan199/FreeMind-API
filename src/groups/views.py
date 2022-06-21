@@ -111,7 +111,7 @@ class GroupsChannelView(APIView):
     def post(self, request):
         if not Groups.objects.filter(id=request.data['group'], gtype='Channel').exists():
             return Response({'detail': ['Channel not found']}, status=status.HTTP_404_NOT_FOUND) 
-        elif (GroupsMember.objects.filter(group=Groups.objects.get(id=request.data['group'], gtype='Channel'), user=request.user)).exists():
+        elif (GroupsMember.objects.filter(group=Groups.objects.get(id=request.data['group'], group__gtype='Channel'), user=request.user)).exists():
             return Response({'detail': ['User already following channel']}, status=status.HTTP_404_NOT_FOUND)
         else:
             try:
