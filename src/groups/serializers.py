@@ -64,7 +64,7 @@ class GroupsMemberSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"email": ["User already in a group."]})
 
         # Change to take group id from user (SINGLEUSERCONSTRAINT)
-        valid_data['group'] = GroupsMember.objects.filter(user=instance_user, gtype='Default').first().group
+        valid_data['group'] = GroupsMember.objects.filter(user=instance_user, group__gtype='Default').first().group
         #
         return super().validate(valid_data)
 
