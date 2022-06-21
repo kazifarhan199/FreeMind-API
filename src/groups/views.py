@@ -90,7 +90,7 @@ class GroupsMemberView(APIView):
         if not GroupsMember.objects.filter(user=instance_user, group__gtype='Default').exists():
             return Response({"group": ["Access Denied."]}, status=status.HTTP_400_BAD_REQUEST)
 
-        instance_usergroup = GroupsMember.objects.get(user=instance_user).group
+        instance_usergroup = GroupsMember.objects.get(user=instance_user, group__gtype="Default").group
         #
 
         if not GroupsMember.objects.filter(user=user, group=instance_usergroup).exists():
