@@ -24,7 +24,7 @@ class PostCreateView(APIView):
         data['user'] = request.user.id
         groups = [gm.group for gm in GroupsMember.objects.filter(user=request.user) if gm.group.gtype == 'Default']
 
-        if not groups:
+        if groups:
             data['group'] = groups[0].id
         else:
             if Groups.objects.filter(user=request.user, gtype='Channel').exists():
