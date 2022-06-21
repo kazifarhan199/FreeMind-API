@@ -26,13 +26,10 @@ class PostCreateView(APIView):
 
         if groups:
             data['group'] = groups[0].id
+        elif Groups.objects.filter(user=request.user, gtype='Channel').exists():
+            data['group'] = Groups.objects.filter(user=request.user, gtype='Channel').first().id
         else:
-            if Groups.objects.filter(user=request.user, gtype='Channel').exists():
-                for g in Groups.objects.filter(user=request.user, gtype='Channel'):
-                    if GroupsMember.objects.filter(user=request.user, group=g):
-                        gm = GroupsMember.objects.filter(user=request.user, group=g)
-                        break
-                data['group'] = gm.group.id
+            return Response({'detail': 'unable to find a group'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = serializers.PostSerializer(data=data, context={'request':request},)
         if serializer.is_valid():
