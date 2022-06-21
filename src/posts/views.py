@@ -22,8 +22,18 @@ class PostCreateView(APIView):
         data['title'] = request.data['title']
 
         data['user'] = request.user.id
-        data['group'] = GroupsMember.objects.filter(user=request.user).first().group.id
-        print(request.POST)
+        groups = [gm.group for gm in GroupsMember.objects.filter(user=request.user) if gm.group.gtype == 'Default']
+
+        if not groups:
+            data['group'] = groups[0].id
+        else:
+            if Groups.objects.filter(user=request.user, gtype='Channel').exists():
+                for g in Groups.objects.filter(user=request.user, gtype='Channel'):
+                    if GroupsMember.objects.filter(user=request.user, group=g):
+                        gm = GroupsMember.objects.filter(user=request.user, group=g)
+                        break
+                data['group'] = gm.group.id
+
         serializer = serializers.PostSerializer(data=data, context={'request':request},)
         if serializer.is_valid():
             post = serializer.save()

@@ -57,13 +57,14 @@ class GroupsMemberSerializer(serializers.ModelSerializer):
 
         # Not allowing user to be added to multiple groups, just disable (SINGLEUSERCONSTRAINT)
         if GroupsMember.objects.filter(user=user).exists():
-            if user == instance_user:
-                raise serializers.ValidationError({"email": ["You are already in a group, please leave the group first."]})
-            raise serializers.ValidationError({"email": ["User already in a group."]})
-        #
+            groups = [g.group for g in GroupsMember.objects.filter(user=user) if g.group.gtype=='Default']
+            if len(groups) > 0:            
+                if user == instance_user:
+                    raise serializers.ValidationError({"email": ["You are already in a group, please leave the group first."]})
+                raise serializers.ValidationError({"email": ["User already in a group."]})
 
         # Change to take group id from user (SINGLEUSERCONSTRAINT)
-        valid_data['group'] = GroupsMember.objects.filter(user=instance_user).first().group
+        valid_data['group'] = GroupsMember.objects.filter(user=instance_user, gtype='Default').first().group
         #
         return super().validate(valid_data)
 
@@ -92,9 +93,11 @@ class GroupsSerializer(serializers.ModelSerializer):
         instance_user = self.context['request'].user
         if GroupsMember.objects.filter(user=valid_data['user']):
             """Allowing only one user in a single group (SINGLEUSERCONSTRAINT)"""
-            if valid_data['user'] == instance_user:
-                raise serializers.ValidationError({"email": ["You are already in a group, please leave the group first."]})
-            raise serializers.ValidationError({"user": ["The user is already in a group."]})
+            groups = [g.group for g in GroupsMember.objects.filter(user=user) if g.group.gtype=='Default']
+            if len(groups) > 0:            
+                if valid_data['user'] == instance_user:
+                    raise serializers.ValidationError({"email": ["You are already in a group, please leave the group first."]})
+                raise serializers.ValidationError({"user": ["The user is already in a group."]})
         return super().create(valid_data)
 
 
