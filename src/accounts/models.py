@@ -9,6 +9,7 @@ User = get_user_model()
 class Profile(models.Model):
     user = models.OneToOneField(User, models.CASCADE)
     image = models.ImageField(upload_to='image')
+    bio = models.TextField(default='')
 
     def __str__(self):
         return str(self.user)

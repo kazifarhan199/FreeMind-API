@@ -1,7 +1,7 @@
 import collections
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import OTP, Device
+from .models import OTP, Device, Profile
 from groups.models import Groups, GroupsMember
 
 User = get_user_model()
@@ -12,6 +12,11 @@ class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=False)
     gid = serializers.SerializerMethodField('get_gid', read_only=True)
     img_obj = serializers.ImageField(allow_null=True, required=False, write_only=True)
+    bio = serializers.SerializerMethodField('get_bio', read_only=True)
+    bio_obj = serializers.CharField(write_only=True)
+
+    def get_bio(self, obj):
+        return Profile.objects.get(user=obj).bio
 
     def get_gid(self, obj):
         if GroupsMember.objects.filter(user=obj).exists():
@@ -34,6 +39,12 @@ class UserSerializer(serializers.ModelSerializer):
                 self.instance.set_password(data.pop('password'))
                 self.instance.save()
                 value = collections.OrderedDict(data)
+
+            if data.get('bio_obj'):
+                """Change bio"""
+                p = Profile.objects.get(user=self.instance)
+                p.bio = data.get('bio_obj')
+                p.save()
 
         else:
             """Register a new user"""
@@ -68,7 +79,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'id', 'token', 'password', 'image', 'gid', 'img_obj', ]
+        fields = ['username', 'email', 'id', 'token', 'password', 'image', 'gid', 'img_obj', 'bio', 'bio_obj']
 
 
 class OTPSerializer(serializers.ModelSerializer):
