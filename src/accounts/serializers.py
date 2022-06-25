@@ -82,6 +82,26 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'id', 'token', 'password', 'image', 'gid', 'img_obj', 'bio', 'bio_obj']
 
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=False)
+    email = serializers.EmailField(required=False)
+    gid = serializers.SerializerMethodField('get_gid', read_only=True)
+    bio = serializers.SerializerMethodField('get_bio', read_only=True)
+
+
+    def get_bio(self, obj):
+        return Profile.objects.get(user=obj).bio
+
+    def get_gid(self, obj):
+        if GroupsMember.objects.filter(user=obj).exists():
+            return GroupsMember.objects.filter(user=obj).first().id
+        else:
+            return 0
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'id', 'image', 'gid', 'bio']
+
 class OTPSerializer(serializers.ModelSerializer):
 
     class Meta:

@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import CreateAPIView
 from rest_framework.authtoken.views import ObtainAuthToken
+from groups.models import GroupsMember, Groups
 from .models import OTP, Device
 from .utils import check_otp_http_response_if_failed, send_otp_email
 from . import serializers
@@ -84,6 +85,14 @@ class Logout(APIView):
 class Profile(APIView):
     def get(self, request):
         '''Profile'''
+        if request.GET.get('user'):
+            if User.objects.filter(pk=request.GET.get('user')).exists():
+                user = User.objects.get(pk=request.GET.get('user'))
+                g1 = [g.group.id for g in GroupsMember.objects.filter(user=user)]
+                g2 = [g.group.id for g in GroupsMember.objects.filter(user=request.user)]
+                if set(g1)&set(g2):
+                    return Response(serializers.UserProfileSerializer(user).data)
+
         return Response(serializers.UserSerializer(request.user).data)
 
 

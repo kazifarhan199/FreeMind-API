@@ -33,7 +33,8 @@ class PostSerializer(serializers.ModelSerializer):
     created_on = serializers.DateTimeField(read_only=True)
     updated_on = serializers.DateTimeField(read_only=True)
     images = PostImageSerializer(many=True, read_only=True)
-    liked = serializers.SerializerMethodField('isLiked')
+    uid = serializers.SerializerMethodField('get_uid')
+    liked = serializers.SerializerMethodField('isLiked')\
 
     def validate(self, valid_data):
         valid_data['user'] = self.context['request'].user
@@ -48,6 +49,8 @@ class PostSerializer(serializers.ModelSerializer):
         PostImages.objects.create(post=post, image=self.context['request'].data['images'])
         return post
 
+    def get_uid(self, obj):
+        return obj.user.id
 
     def isLiked(self, obj):
         request = self.context.get('request', None)
@@ -71,6 +74,7 @@ class PostSerializer(serializers.ModelSerializer):
             'updated_on',
             'images',
             'liked',
+            'uid',
         )
 
 
