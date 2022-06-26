@@ -34,11 +34,14 @@ class PostSerializer(serializers.ModelSerializer):
     updated_on = serializers.DateTimeField(read_only=True)
     images = PostImageSerializer(many=True, read_only=True)
     uid = serializers.SerializerMethodField('get_uid')
-    liked = serializers.SerializerMethodField('isLiked')\
+    liked = serializers.SerializerMethodField('isLiked')
+    
+    group_name = serializers.SerializerMethodField('get_group_name')
+    group_image = serializers.SerializerMethodField('get_group_image')
 
     def validate(self, valid_data):
         valid_data['user'] = self.context['request'].user
-        # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
+        # Allowing only one user in a single group (SINGLEUSERCONSTRAIN)
         if not self.context['request'].data.get('images'):
             """User who is add is not in group"""
             raise serializers.ValidationError({"images": ["This fiels is required."]})
@@ -51,6 +54,12 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_uid(self, obj):
         return obj.user.id
+
+    def get_group_name(self, obj):
+        return obj.group.group_name
+
+    def get_group_image(self, obj):
+        return obj.group.image.url
 
     def isLiked(self, obj):
         request = self.context.get('request', None)
@@ -75,6 +84,8 @@ class PostSerializer(serializers.ModelSerializer):
             'images',
             'liked',
             'uid',
+            'group_name',
+            'group_image',
         )
 
 
@@ -112,7 +123,7 @@ class PostLikeSerializer(serializers.ModelSerializer):
         request = self.context['request']
         valid_data['user'] = request.user
 
-        # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
+        # Allowing only one user in a single group (SINGLEUSERCONSTRAIN)
         groups = [g.group.id for g in GroupsMember.objects.filter(user=request.user)]
         post_group = Post.objects.get(pk=valid_data['post'].id).group.id
 
@@ -150,7 +161,7 @@ class PostCommentSerializer(serializers.ModelSerializer):
         request = self.context['request']
         valid_data['user'] = request.user
 
-        # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
+        # Allowing only one user in a single group (SINGLEUSERCONSTRAIN)
         groups = [g.group.id for g in GroupsMember.objects.filter(user=request.user)]
         post_group = Post.objects.get(pk=valid_data['post'].id).group.id
 

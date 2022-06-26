@@ -54,10 +54,15 @@ class GroupsSerializer(serializers.ModelSerializer):
     members = GroupsMemberSerializer(many=True, read_only=True)
     group_name = serializers.CharField()
     isin = serializers.SerializerMethodField('isIn')
+    image_path = serializers.SerializerMethodField('get_image')
+    
+
+    def get_image(self, obj):
+        return obj.image.url
 
     class Meta:
         model = Groups
-        fields = ('group_name', 'members', 'user', 'id', 'isin')
+        fields = ('group_name', 'members', 'user', 'id', 'isin', 'image', 'image_path')
 
     def isIn(self, obj):
         user = self.context.get('request', None).user

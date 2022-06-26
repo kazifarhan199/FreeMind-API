@@ -7,6 +7,7 @@ User = get_user_model()
 class Groups(models.Model):
     group_name = models.CharField(max_length=200)
     user = models.ForeignKey(User, models.CASCADE, related_name='profilegroup')
+    image = models.ImageField(default='media/image/default_profile.jpg', upload_to='groups')
     gtype = models.CharField(
         max_length = 20,
         choices = (('Default', 'Default'), ('Channel', 'Channel')),

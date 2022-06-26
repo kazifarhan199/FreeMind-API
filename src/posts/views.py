@@ -24,12 +24,23 @@ class PostCreateView(APIView):
         data['title'] = request.data['title']
 
         data['user'] = request.user.id
-        groups = [gm.group for gm in GroupsMember.objects.filter(user=request.user) if gm.group.gtype == 'Default']
 
-        if groups:
-            data['group'] = groups[0].id
-        elif Groups.objects.filter(user=request.user, gtype='Channel').exists():
-            data['group'] = Groups.objects.filter(user=request.user, gtype='Channel').first().id
+        if not request.data.get('group'):
+            return Response({"group": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not GroupsMember.objects.filter(user=request.user, group__id=request.data.get('group')).exists():
+            return Response({"group": ["Access denied."]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        gm = GroupsMember.objects.get(user=request.user, group__id=request.data.get('group'))
+
+        if gm.group.gtype == 'Default':
+            data['group'] = gm.group.id
+        elif gm.group.gtype == 'Channel':
+            if not gm.group.user == request.user:
+                data['group'] = gm.group.id
+            else:
+                return Response({'detail': 'unable to find a group'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'detail': 'unable to find a group'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -47,10 +58,8 @@ class ProfilePostListView(ListAPIView):
     def get_queryset(self):
         user = self.request.GET.get('user')
         if user:
-            print(user)
             user = User.objects.filter(pk=user)
             if user.exists():
-                print(user) 
                 user = user.first()
                 groups = [gm.group.id for gm in GroupsMember.objects.filter(user=user)] 
                 queryset = Post.objects.filter(user=user, group__id__in=groups)
