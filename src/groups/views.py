@@ -9,8 +9,68 @@ from accounts.serializers import UserSerializer
 from .models import Groups, GroupsMember, User
 from . import serializers
 from . import permissions
+from posts.pagination import PostPageNumberPagination1000
 
 User = get_user_model()
+
+class GroupListView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = serializers.GroupsSerializer
+    pagination_class = PostPageNumberPagination1000
+    
+    def get_queryset(self):
+        gms = [gm.group.id for gm in GroupsMember.objects.filter(user=self.request.user)]
+        queryset = Groups.objects.filter(
+                pk__in=gms
+            )
+        return queryset.order_by('-id')
+
+class GroupsView(APIView):
+    serializer_class = serializers.GroupsSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        # Allowing only one user in a single group (SINGLEUSERCONSIsInGroupTRAIN)
+        if not request.GET.get('group'):
+            '''group field is provided'''
+            return Response({"group": ["Group field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not Groups.objects.filter(pk=request.GET['group']).exists():
+            '''Group does not exists'''
+            return Response({"group": ["Group does not exists."]}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not GroupsMember.objects.filter(user=request.user, group=Groups.objects.get(pk=request.GET['group'])).exists():
+            '''User not present in group'''
+            return Response({"user": ["User not part of group."]}, status=status.HTTP_400_BAD_REQUEST)
+
+        group = GroupsMember.objects.get(user=request.user, group=Groups.objects.get(pk=request.GET['group'])).group
+        serializer = self.serializer_class(group, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        data = request.data.copy()
+        data['user'] = request.user.id
+
+        if not request.GET.get('group'):
+            '''group field is provided'''
+            return Response({"group": ["Group field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not Groups.objects.filter(pk=request.GET['group']).exists():
+            '''Group does not exists'''
+            return Response({"group": ["Group does not exists."]}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not GroupsMember.objects.filter(user=request.user, group=Groups.objects.get(pk=request.GET['group'])).exists():
+            '''User not present in group'''
+            return Response({"user": ["User not part of group."]}, status=status.HTTP_400_BAD_REQUEST)
+
+        group = GroupsMember.objects.get(user=request.user, group=Groups.objects.get(pk=request.GET['group'])).group
+
+        serializer = self.serializer_class(data=data, instance=group , context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class GroupsCreateView(APIView):
     serializer_class = serializers.GroupsSerializer
@@ -24,50 +84,10 @@ class GroupsCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class GroupsView(APIView):
-    serializer_class = serializers.GroupsSerializer
-    permission_classes = (IsAuthenticated, permissions.IsInGroup)
-
-    def get(self, request):
-        # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
-        group = GroupsMember.objects.filter(user=request.user).first().group
-        serializer = self.serializer_class(group, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request):
-        data = request.data.copy()
-        data['user'] = request.user.id
-        # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
-        serializer = self.serializer_class(data=data, instance=GroupsMember.objects.filter(user=request.user).first().group , context={'request': request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class GroupsMemberView(APIView):
     serializer_class = serializers.GroupsMemberSerializer
     permission_classes = (IsAuthenticated, permissions.IsInGroup)
-
-    def get(self, request):
-        email = request.data.get('email')
-        if not email:
-            return Response({"email": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
-
-        if User.objects.filter(username=email).exists():
-            email = User.objects.get(username=email).email
-        print(email)
-
-
-        if GroupsMember.objects.filter(user__email=email).exists():
-            return Response({'detail': ['User unavailable']}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            if User.objects.filter(email=email).exists():
-                return Response(UserSerializer(User.objects.get(email=email)).data)
-            else:
-                return Response({'detail': ['User unavailable']}, status=status.HTTP_404_NOT_FOUND)
-
-
 
     def post(self, request): 
         serializer = serializers.GroupsMemberSerializer(data=request.data, context={'request': request})
@@ -77,33 +97,17 @@ class GroupsMemberView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
-        instance_user = request.user
-        email = request.data.get('email')
-        if not email:
-            return Response({"email": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
-        if not User.objects.filter(email=email).exists():
-            return Response({"email": ["User with this email does not exists."]}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = serializers.GroupsMemberSerializer(data=request.data, context={'request': request})
 
-        user = User.objects.get(email=email)
-
-        # Change to take group id from user (SINGLEUSERCONSTRAINT)
-        if not GroupsMember.objects.filter(user=instance_user, group__gtype='Default').exists():
-            return Response({"group": ["Access Denied."]}, status=status.HTTP_400_BAD_REQUEST)
-
-        instance_usergroup = GroupsMember.objects.get(user=instance_user, group__gtype="Default").group
-        #
-
-        if not GroupsMember.objects.filter(user=user, group=instance_usergroup).exists():
-          return Response({"email": ["User with this email does not exists in the group."]}, status=status.HTTP_400_BAD_REQUEST)
-
-        GroupsMember.objects.filter(user=user, group__id=request.data.get('group')).delete()
+        gm = GroupsMember.objects.get(user=User.objects.get(email=request.data.get('email')), group__gtype='Default', group=Groups.objects.get(pk=request.GET['group']))
+        gm.delete()
         return Response({'detail': ['User removed from the group']}, status=status.HTTP_202_ACCEPTED)
 
 
 class GroupsChannelView(APIView):
+    permission_classes = (IsAuthenticated, )
 
     def get(self, request):
-        # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
         groups = Groups.objects.filter(gtype='Channel')
         serializer = serializers.GroupsSerializer(groups, context={'request': request}, many=True)
         return Response({'results':serializer.data}, status=status.HTTP_200_OK)

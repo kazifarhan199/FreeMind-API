@@ -17,60 +17,37 @@ class GroupsMemberSerializer(serializers.ModelSerializer):
         
 
     def validate(self, valid_data):
-        user = None
-        if User.objects.filter(email=self.context['request'].data.get('email')).exists():
-            user=User.objects.get(email=self.context['request'].data.get('email'))
-    
-        if User.objects.filter(username=self.context['request'].data.get('email')).exists():
-            user=User.objects.get(username=self.context['request'].data.get('email'))
-        if user == None:
-            raise serializers.ValidationError({"user": ["User not found."]})
-
-        valid_data['user'] = user
-
         email = self.context['request'].data.get('email')
-        instance_user = self.context['request'].user
-            
-        group=GroupsMember.objects.filter(user=instance_user).first().group.id
-        if not group:
-            raise serializers.ValidationError({"group": ["This field is required."]})
-        #
+        if not email: raise serializers.ValidationError({"email": ["This field is required."]})
 
-        if not email:
-            raise serializers.ValidationError({"email": ["This field is required."]})
-        
+        gid = self.context['request'].GET.get('group')
+        if not gid: raise serializers.ValidationError({"group": ["This field is required."]})
+
         user = None
-        if not User.objects.filter(email=email).exists():
-            if not User.objects.filter(username=email).exists():
-                raise serializers.ValidationError({"email/username": ["User with this email does not exists."]})
-            else:
-                user = User.objects.get(username=email)
-        else:
-            user = User.objects.get(email=email)
+        if User.objects.filter(email=email).exists(): user = User.objects.get(email=email)
+        if User.objects.filter(username=email).exists(): user = User.objects.get(username=email)
+        if user == None: raise serializers.ValidationError({"user": ["User not found."]})
+        '''User present'''
+        user = user
+        instance_user = self.context['request'].user
 
-        if not Groups.objects.filter(pk=group).exists():
-            """Group does not exists"""
-            raise serializers.ValidationError({"group": ["No group found."]})
-        if not GroupsMember.objects.filter(user=instance_user, group_id=group).exists():
-            """User who is add is not in group"""
-            raise serializers.ValidationError({"group": ["Access denied."]})
+        if not Groups.objects.filter(pk=gid).exists(): raise serializers.ValidationError({"group": ["Group does not exists."]})
+        if not GroupsMember.objects.filter(user=instance_user, group=Groups.objects.get(pk=gid)).exists():
+            '''User not present in group'''
+            raise serializers.ValidationError({"user": ["User not part of group."]})
 
-        # Not allowing user to be added to multiple groups, just disable (SINGLEUSERCONSTRAINT)
-        if GroupsMember.objects.filter(user=user).exists():
-            groups = [g.group for g in GroupsMember.objects.filter(user=user) if g.group.gtype=='Default']
-            if len(groups) > 0:            
-                if user == instance_user:
-                    raise serializers.ValidationError({"email": ["You are already in a group, please leave the group first."]})
-                raise serializers.ValidationError({"email": ["User already in a group."]})
+        group = GroupsMember.objects.get(user=instance_user, group=Groups.objects.get(pk=gid)).group
 
-        # Change to take group id from user (SINGLEUSERCONSTRAINT)
-        valid_data['group'] = GroupsMember.objects.filter(user=instance_user, group__gtype='Default').first().group
-        #
+        if GroupsMember.objects.filter(user=user, group=group).exists():
+            raise serializers.ValidationError({"user": ["User already present in the group."]})
+
+        valid_data['group'] = group
+        valid_data['user'] = user
         return super().validate(valid_data)
 
     class Meta:
         model = GroupsMember
-        fields = ('username', 'userimage', 'email', 'user', )
+        fields = ('username', 'userimage', 'email', 'user')
 
 
 class GroupsSerializer(serializers.ModelSerializer):
@@ -91,13 +68,6 @@ class GroupsSerializer(serializers.ModelSerializer):
 
     def create(self, valid_data):
         instance_user = self.context['request'].user
-        if GroupsMember.objects.filter(user=valid_data['user']):
-            """Allowing only one user in a single group (SINGLEUSERCONSTRAINT)"""
-            groups = [g.group for g in GroupsMember.objects.filter(user=user) if g.group.gtype=='Default']
-            if len(groups) > 0:            
-                if valid_data['user'] == instance_user:
-                    raise serializers.ValidationError({"email": ["You are already in a group, please leave the group first."]})
-                raise serializers.ValidationError({"user": ["The user is already in a group."]})
         return super().create(valid_data)
 
 

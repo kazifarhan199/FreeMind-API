@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from groups.models import GroupsMember, Groups
-from groups.permissions import IsInGroup
 from accounts.serializers import UserSerializer
 from .pagination import PostPageNumberPagination, PostPageNumberPagination1000
 from .models import Post, PostComment, PostLike
@@ -15,7 +14,7 @@ from . import permissions
 User = get_user_model()
 
 class PostCreateView(APIView):
-    permission_classes = (IsAuthenticated, IsInGroup, )
+    permission_classes = (IsAuthenticated, )
 
     def post(self, request):
         data = {}
@@ -61,7 +60,7 @@ class ProfilePostListView(ListAPIView):
         return queryset.order_by('-created_on')
 
 class PostListView(ListAPIView):
-    permission_classes = (IsAuthenticated, IsInGroup, )
+    permission_classes = (IsAuthenticated, )
     serializer_class = serializers.PostSerializer
     pagination_class = PostPageNumberPagination
     
@@ -75,22 +74,23 @@ class PostDetailView(APIView):
     permission_classes = (IsAuthenticated, permissions.hasGroup_PostExists_UserBelongToPostGroup, )
 
     def get(self, request):
-            # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
-        if Post.objects.filter(
-            group = GroupsMember.objects.filter(user=request.user).first().group,
-            pk = request.GET.get('post'),
-        ).exists():
-            serializer = serializers.PostSerializer(
-                Post.objects.get(
-                    # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
-                    group = GroupsMember.objects.filter(user=request.user).first().group,
-                    pk = request.GET.get('post'),
-                ),
-                context={'request':request},
-            )
-            return Response(serializer.data)
-        else:
-            return Response({'post':["Post not fount"]}, status=status.HTTP_404_NOT_FOUND)   
+        # Allowing only one user in a single group (SINGLEUSERCONSTRAIN)
+        for gm in GroupsMember.objects.filter(user=request.user):
+            if Post.objects.filter(
+                group = gm.group,
+                pk = request.GET.get('post'),
+            ).exists():
+                serializer = serializers.PostSerializer(
+                    Post.objects.get(
+                        # Allowing only one user in a single group (SINGLEUSERCONSTRAIN)
+                        group = gm.group,
+                        pk = request.GET.get('post'),
+                    ),
+                    context={'request':request},
+                )
+                return Response(serializer.data)
+
+        return Response({'post':["Post not fount"]}, status=status.HTTP_404_NOT_FOUND)   
 
 
 class PostDeleteView(APIView):

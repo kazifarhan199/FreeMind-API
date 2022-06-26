@@ -40,7 +40,7 @@ class hasGroup_PostExists_UserBelongToPostGroup(BasePermission):
             return False
 
         post = Post.objects.get(pk=post_id)
-        # Allowing only one user in a single group (SINGLEUSERCONSTRAINT)
+        # Allowing only one user in a single group (SINGLEUSERCONSTRAIN)
         for group_member in GroupsMember.objects.filter(user=request.user):
             if group_member:
                 self.message = "Permission Denied"
