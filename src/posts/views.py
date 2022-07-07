@@ -208,6 +208,6 @@ class CommentFeedbackView(APIView):
             c = PostComment.objects.get(pk=request.data['comment'])
             c.need_feadback = False
             c.save()             
-            print(PostComment.objects.get(pk=request.data['comment']).need_feadback)
+            # print(PostComment.objects.get(pk=request.data['comment']).need_feadback)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

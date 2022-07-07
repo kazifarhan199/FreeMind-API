@@ -8,7 +8,6 @@ from accounts.models import Device
 
 def sendNotifications(sender, instance, created, **kwargs):
     devices = Device.objects.filter(user=instance.user)
-    print(devices)
 
     if instance.seen:
         return 

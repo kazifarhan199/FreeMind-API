@@ -29,11 +29,11 @@ else:
   def get_estimation(text_list, current_user):
 
     predictions, raw_outputs = model.predict(text_list)
-    print('Predictions are ', predictions)
+    # print('Predictions are ', predictions)
 
     d = {0:'Exercise', 1:'Food', 2:'general', 3: 'Stress'}
     NLP_model_prediction = d.get(predictions[0])
-    print("The predicted catagory is", NLP_model_prediction)
+    # print("The predicted catagory is", NLP_model_prediction)
     d_values = list(d.values())
 
     showed_label = [t.label.id for t in Tracker.objects.filter(user=current_user).order_by('-id')][:10 if len(Tracker.objects.filter(user=current_user))>10 else len(Tracker.objects.filter(user=current_user))]
