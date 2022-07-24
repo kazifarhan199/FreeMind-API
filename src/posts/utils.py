@@ -1,9 +1,6 @@
 from django.conf import settings
 from recommendations.models import Ratings, Labels, Tracker
-from surprise import NMF
 import pandas as pd
-from surprise import Dataset
-from surprise import Reader
 import os
 import random
 from copy import deepcopy
@@ -14,6 +11,9 @@ if not settings.USE_MODEL:
     
 else:
   from simpletransformers.classification import ClassificationModel, ClassificationArgs
+  from surprise import NMF
+  from surprise import Dataset
+  from surprise import Reader
   import torch
 
   model_args = ClassificationArgs(
