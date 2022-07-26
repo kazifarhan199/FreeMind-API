@@ -5,24 +5,18 @@ from .models import PostComment
 from .utils import get_estimation
 from django.conf import settings
 from recommendations.models import Tracker
-import threading
+
 
 User = get_user_model()
 
 def postCreatedNotification(sender, instance, created, **kwargs):
-    start_time = threading.Timer(settings.BOT_ID, lambda : postCreatedNotification_threaded(sender, instance, created, **kwargs))
-    start_time.start()
+    # settings.BOT_ID
+    postCreatedNotification_threaded(sender, instance, created, **kwargs)
 
 def postCreatedNotification_threaded(sender, instance, created, **kwargs):
     # Sending recommendation
     if created:
-        label, NLP_model_prediction, label_scores, label_type_scores, scores = get_estimation([instance.title, ], instance.user)
-        # Ussing Bot user to send notifications
-        # try:
-        c = PostComment.objects.create(user=User.objects.get(pk=settings.BOT_ID), post=instance, text=label.reason, need_feadback=True, link=label.link, is_bot=True)
-        Tracker.objects.create(user=instance.user, label=label, nlp_classification=NLP_model_prediction, recommendation_tree=scores, comment=c, labelType_scores=label_type_scores, label_scores=label_scores)
-        # except:
-        #     print("Fix the bot id !!!")
+        get_estimation.delay([instance.title, ], instance.user.id, instance.id)
     # Sending notification
     if created:
         # If a new post is created 

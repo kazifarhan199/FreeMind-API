@@ -1,13 +1,31 @@
 from django.conf import settings
+from posts.models import Post, PostComment
 from recommendations.models import Ratings, Labels, Tracker
 import pandas as pd
 import os
 import random
 from copy import deepcopy
+from celery import shared_task
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 if not settings.USE_MODEL:
-  def get_estimation(text, current_user):
-    return Labels.objects.all().first(), "NLP_model_prediction", ["This is just a demo"]
+  import time
+
+  @shared_task 
+  def get_estimation(text_list, current_user_id, instance_id):
+    instance = Post.objects.get(pk=instance_id)
+    current_user = User.objects.get(pk=current_user_id)
+    time.sleep(3)
+
+    label, NLP_model_prediction, label_scores, label_type_scores, scores = Labels.objects.all().first(), [10, 20, 5], [10, 4, 2], [40, 50, 10], [10, 20, 40]
+    
+    c = PostComment.objects.create(user=User.objects.get(pk=settings.BOT_ID), post=instance, text=label.reason, need_feadback=True, link=label.link, is_bot=True)
+    
+    Tracker.objects.create(user=current_user, label=label, nlp_classification=NLP_model_prediction, recommendation_tree=scores, comment=c, labelType_scores=label_type_scores, label_scores=label_scores)
+    
+    return label, NLP_model_prediction, label_scores, label_type_scores, scores
     
 else:
   from simpletransformers.classification import ClassificationModel, ClassificationArgs
@@ -26,7 +44,10 @@ else:
       settings.MODEL_NAME, settings.MODELS_PATH
   )
 
-  def get_estimation(text_list, current_user):
+  @shared_task 
+  def get_estimation(text_list, current_user_id, instance_id):
+    instance = Post.objects.get(pk=instance_id)
+    current_user = User.objects.get(pk=current_user_id)
 
     predictions, raw_outputs = model.predict(text_list)
     # print('Predictions are ', predictions)
@@ -64,6 +85,12 @@ else:
     label_scores = [(ls[0], ls[1].id, ls[1].name) for ls in label_scores]
     label_type_scores = [(ls[0], ls[1].id, ls[1].name) for ls in label_type_scores]
     new_label_scores = [(ls[0], ls[1].id, ls[1].name) for ls in new_label_scores]
+
+#  For celery
+    c = PostComment.objects.create(user=User.objects.get(pk=settings.BOT_ID), post=instance, text=label.reason, need_feadback=True, link=label.link, is_bot=True)
+    
+    Tracker.objects.create(user=current_user, label=label, nlp_classification=NLP_model_prediction, recommendation_tree=new_label_scores, comment=c, labelType_scores=label_type_scores, label_scores=label_scores)
+#
 
     return label, NLP_model_prediction, label_scores, label_type_scores, new_label_scores
 
