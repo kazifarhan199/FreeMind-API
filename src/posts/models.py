@@ -14,6 +14,7 @@ class Post(models.Model):
     title = models.TextField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
+    link = models.TextField(default="")
 
     def __str__(self):
         return str(self.user)+"'s post"

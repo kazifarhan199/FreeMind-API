@@ -86,6 +86,7 @@ class PostSerializer(serializers.ModelSerializer):
             'uid',
             'group_name',
             'group_image',
+            'link',
         )
 
 

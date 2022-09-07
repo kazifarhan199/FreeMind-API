@@ -37,7 +37,7 @@ class PostCreateView(APIView):
         if gm.group.gtype == 'Default':
             data['group'] = gm.group.id
         elif gm.group.gtype == 'Channel':
-            if not gm.group.user == request.user:
+            if gm.group.user == request.user:
                 data['group'] = gm.group.id
             else:
                 return Response({'detail': 'unable to find a group'}, status=status.HTTP_400_BAD_REQUEST)
