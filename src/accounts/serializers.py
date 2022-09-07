@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
     gid = serializers.SerializerMethodField('get_gid', read_only=True)
     img_obj = serializers.ImageField(allow_null=True, required=False, write_only=True)
     bio = serializers.SerializerMethodField('get_bio', read_only=True)
-    bio_obj = serializers.CharField(write_only=True)
+    bio_obj = serializers.CharField(write_only=True, required=False)
 
     def get_bio(self, obj):
         return Profile.objects.get(user=obj).bio
@@ -40,7 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
                 self.instance.save()
                 value = collections.OrderedDict(data)
 
-            if data.get('bio_obj'):
+            elif data.get('bio_obj'):
                 """Change bio"""
                 p = Profile.objects.get(user=self.instance)
                 p.bio = data.get('bio_obj')
