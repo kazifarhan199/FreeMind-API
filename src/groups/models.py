@@ -14,6 +14,13 @@ class Groups(models.Model):
         default = 'Default'
     )
 
+    @property
+    def is_channel(self):
+        if self.gtype == 'Channel':
+            return True
+        else:
+            return False
+
     def __str__(self):
         return str(self.group_name)
 
