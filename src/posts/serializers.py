@@ -1,3 +1,4 @@
+from email.policy import default
 import posts
 from django.contrib.auth import get_user_model
 from django.http import request
@@ -38,6 +39,7 @@ class PostSerializer(serializers.ModelSerializer):
     
     group_name = serializers.SerializerMethodField('get_group_name')
     group_image = serializers.SerializerMethodField('get_group_image')
+    link = serializers.CharField(required=False, allow_blank=True)
 
     def validate(self, valid_data):
         valid_data['user'] = self.context['request'].user
