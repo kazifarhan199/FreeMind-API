@@ -54,7 +54,7 @@ class PostCreateView(APIView):
 class ProfilePostListView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = serializers.PostSerializer
-    pagination_class = PostPageNumberPagination
+    pagination_class = PostPageNumberPagination1000
 
     def get_queryset(self):
         user = self.request.GET.get('user')
