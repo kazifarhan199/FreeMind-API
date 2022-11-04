@@ -22,7 +22,10 @@ class PostCreateView(APIView):
         if (not request.data.get('title')):
             return Response({'title': ['Title is required', ]}, status=status.HTTP_400_BAD_REQUEST)
         data['title'] = request.data['title']
-        data['link'] = request.data['link']
+        if request.data.get('link'):
+            data['link'] = request.data['link']
+        else:
+            data['link'] = ''
 
         data['user'] = request.user.id
 
