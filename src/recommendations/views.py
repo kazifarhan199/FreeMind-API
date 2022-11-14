@@ -14,7 +14,7 @@ class QuestionsListView(ListAPIView):
     pagination_class = PostPageNumberPagination1000
     
     def get_queryset(self):
-        queryset = models.Labels.objects.filter(is_label=False, is_coupuled=False)
+        queryset = models.Labels.objects.filter(is_label=False, is_coupuled=False).order_by('-id')
         return queryset
 
 class QuestionsCopuledListView(ListAPIView):
@@ -23,7 +23,7 @@ class QuestionsCopuledListView(ListAPIView):
     pagination_class = PostPageNumberPagination1000
     
     def get_queryset(self):
-        queryset = models.Labels.objects.filter(is_label=False, is_coupuled=True)
+        queryset = models.Labels.objects.filter(is_label=False, is_coupuled=True).order_by('-id')
         return queryset
 
 

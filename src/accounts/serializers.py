@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import OTP, Device, Profile
 from groups.models import Groups, GroupsMember
+from recommendations.models import Ratings
 
 User = get_user_model()
 
@@ -14,6 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
     img_obj = serializers.ImageField(allow_null=True, required=False, write_only=True)
     bio = serializers.SerializerMethodField('get_bio', read_only=True)
     bio_obj = serializers.CharField(write_only=True, required=False)
+    survey_given = serializers.SerializerMethodField('get_survey_given', read_only=True)
 
     def get_bio(self, obj):
         return Profile.objects.get(user=obj).bio
@@ -23,6 +25,11 @@ class UserSerializer(serializers.ModelSerializer):
             return GroupsMember.objects.filter(user=obj).first().id
         else:
             return 0
+
+    def get_survey_given(self, obj):
+        if len(Ratings.objects.filter(user=obj)) > 20:
+            return True
+        return False
 
 
     def validate(self, value):
@@ -79,7 +86,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'id', 'token', 'password', 'image', 'gid', 'img_obj', 'bio', 'bio_obj']
+        fields = ['username', 'email', 'id', 'token', 'password', 'image', 'gid', 'img_obj', 'bio', 'bio_obj', 'survey_given']
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
