@@ -9,9 +9,16 @@ from accounts.models import Device
 def sendNotifications(sender, instance, created, **kwargs):
     devices = Device.objects.filter(user=instance.user)
 
-    if instance.seen:
+    if instance.survey:
+        sendSurveyNotifications(sender, instance, created, **kwargs)
+        return 
+    else:
+        sendPostNotifications(sender, instance, created, **kwargs)
         return 
 
+
+def sendPostNotifications(sender, instance, created, **kwargs):
+    devices = Device.objects.filter(user=instance.user)
     if instance.post_like != None:
         data = {
                     "click_action":"FLUTTER_NOTIFICATION_CLICK",
@@ -55,6 +62,38 @@ def sendNotifications(sender, instance, created, **kwargs):
         )
         
 
+
+        if json.loads(re.text)['results'][0].get('error')=='NotRegistered':
+            d.delete()
+
+
+def sendSurveyNotifications(sender, instance, created, **kwargs):
+    devices = Device.objects.filter(user=instance.user)
+    data = {
+                "click_action":"FLUTTER_NOTIFICATION_CLICK",
+                "notification_id": instance.id,
+                "title": instance.text, 
+                "body": "",
+                "post": 0,
+                "survey": True
+            }
+
+    for d in devices:
+        re = requests.post(
+            'https://fcm.googleapis.com/fcm/send', 
+            data = json.dumps({
+                "to": d.devicetoken,
+                "mutable_content" : True,
+                "content_available": True,
+                "data": data,
+                "notification": {
+                }
+            }),     
+            headers = {
+                "Authorization":"key="+settings.FIREBASE_PROJECT_KEY,
+                "Content-Type":"application/json"
+            }
+        )
 
         if json.loads(re.text)['results'][0].get('error')=='NotRegistered':
             d.delete()

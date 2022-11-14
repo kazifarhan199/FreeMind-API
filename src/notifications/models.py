@@ -9,12 +9,13 @@ User = get_user_model()
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
-    post = models.ForeignKey(Post, models.CASCADE)
-    post_comment = models.ForeignKey(PostComment, models.CASCADE, null=True)
-    post_like = models.ForeignKey(PostLike, models.CASCADE, null=True)
+    post = models.ForeignKey(Post, models.CASCADE, null=True, blank=True)
+    post_comment = models.ForeignKey(PostComment, models.CASCADE, null=True, blank=True)
+    post_like = models.ForeignKey(PostLike, models.CASCADE, null=True, blank=True)
     seen = models.BooleanField(default=False)
     show = models.BooleanField(default=True)
     text = models.CharField(max_length=300)
+    survey = models.BooleanField(default=False, blank=True)
 
 
     def __str__(self):
