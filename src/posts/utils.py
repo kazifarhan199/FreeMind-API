@@ -97,7 +97,7 @@ else:
 
 
 def get_label_scores_recommendation(current_user, all_labels):
-    objects = Ratings.objects.filter(is_label=True).order_by('id')
+    objects = Ratings.objects.filter(is_label=True, is_active=True).order_by('id')
     
     users = [i.user.id for i in objects]
     ratings = [i.rating for i in objects]
@@ -117,7 +117,7 @@ def get_label_scores_recommendation(current_user, all_labels):
 
 def get_label_type_questiosn_scores_recommendation(current_user, ):
 
-    objects = Ratings.objects.filter(is_label=False).order_by('id')
+    objects = Ratings.objects.filter(is_label=False, is_active=True).order_by('id')
     users = [i.user.id for i in objects]
     ratings = [(6-i.rating)/3 if i.label.is_coupuled==False else (i.rating)/2 for i in objects]
     labels = [i.label.id for i in objects]
