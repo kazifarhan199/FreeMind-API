@@ -54,8 +54,12 @@ class RecommendationsView(APIView):
     def post(self, request):
         data = request.data.copy()
         data['user'] = request.user.id
+        data['is_active'] = True
         serializer = serializers.RatingsSerializer(data=data, context={'request':request},)
         if serializer.is_valid():
+            for obj in models.Ratings.objects.filter(user=self.request.user, label=data['label'], is_active=True):
+                obj.is_active = False
+                obj.save()
             rating = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

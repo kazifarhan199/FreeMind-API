@@ -14,9 +14,6 @@ class RatingsSerializer(serializers.ModelSerializer):
         model = Ratings
         fields = '__all__'
 
-    def validate(self, valid_data):
-        return super().validate(valid_data)
-
 
 class LabelsSerializer(serializers.ModelSerializer):
     class Meta:

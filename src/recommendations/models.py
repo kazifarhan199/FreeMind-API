@@ -23,6 +23,8 @@ class Labels(models.Model):
 class Ratings(models.Model):
     label = models.ForeignKey(Labels, models.CASCADE)
     user = models.ForeignKey(User, models.CASCADE)
+    datetime = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
     rating = models.IntegerField(
         validators=[
             MaxValueValidator(5),
@@ -34,8 +36,6 @@ class Ratings(models.Model):
     def __str__(self):
         return f'{self.label}, {self.user}'
 
-    class Meta:
-        unique_together = ('label', 'user')
 
 class Tracker(models.Model):
     user = models.ForeignKey(User, models.CASCADE)
