@@ -16,7 +16,8 @@ def postCreatedNotification(sender, instance, created, **kwargs):
 def postCreatedNotification_threaded(sender, instance, created, **kwargs):
     # Sending recommendation
     if created:
-        get_estimation.delay([instance.title, ], instance.user.id, instance.id)
+        get_estimation([instance.title, ], instance.user.id, instance.id)
+        # get_estimation.delay([instance.title, ], instance.user.id, instance.id)
     # Sending notification
     if created:
         # If a new post is created 
