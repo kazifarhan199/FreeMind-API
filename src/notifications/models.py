@@ -42,7 +42,10 @@ class Notification(models.Model):
         if user != None:
             return str(user.image)
         else:
-            return "None"
+            if self.survey:
+                return "/media/image/default_profile.jpg"
+            else:
+                return "/media/image/default_profile.jpg"
 
 
 
