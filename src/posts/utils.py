@@ -32,7 +32,6 @@ else:
   from surprise import NMF
   from surprise import Dataset
   from surprise import Reader
-  import torch
 
   model_args = ClassificationArgs(
       num_train_epochs=1,
@@ -44,7 +43,7 @@ else:
       settings.MODEL_NAME, settings.MODELS_PATH
   )
 
-  @shared_task 
+  # @shared_task 
   def get_estimation(text_list, current_user_id, instance_id):
     instance = Post.objects.get(pk=instance_id)
     current_user = User.objects.get(pk=current_user_id)
