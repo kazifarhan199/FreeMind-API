@@ -13,7 +13,7 @@ User = get_user_model()
 if not settings.USE_MODEL:
   import time
 
-  @shared_task 
+  # @shared_task 
   def get_estimation(text_list, current_user_id, instance_id):
     instance = Post.objects.get(pk=instance_id)
     current_user = User.objects.get(pk=current_user_id)
