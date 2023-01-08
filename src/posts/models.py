@@ -15,6 +15,8 @@ class Post(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
     link = models.TextField(default="")
+    need_feadback = models.BooleanField(default=False, blank=True)
+    is_recommendation = models.BooleanField(default=False, blank=True)
 
     def __str__(self):
         return str(self.user)+"'s post"
