@@ -1,4 +1,4 @@
-from .utils import sendPostRecommendations, sendGroupRecommendations
+from .utils import sendPostRecommendations, sendGroupRecommendations, sendPostRecommendationsSocial
 from posts.models import Post
 
 def sendGroupRecommendationsSignal(sender, instance, *args, **kwargs):
@@ -11,6 +11,7 @@ def sendGroupRecommendationsSignal(sender, instance, *args, **kwargs):
 
 
 def sendPostRecommendationsSignal(sender, instance, *args, **kwargs):
-    sendPostRecommendations.delay(instance.id)
+    # sendPostRecommendations.delay(instance.id)
+    sendPostRecommendationsSocial.delay(instance.id)
 
     

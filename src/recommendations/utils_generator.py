@@ -36,9 +36,9 @@ def generatePostRecommendations(instance):
     label_ratings = generateColleberativeFilteringRecommnedation(instance.user, is_label=True, is_coupuled=False)
 
     if label_ratings == None:
-        recommendation_list = Labels.objects.filter(is_label=True, is_coupuled=False).order_by('?').first()
+        recommendation_list = Labels.objects.filter(is_label=True, is_coupuled=False).order_by('?')
         recommendation_index = 0
-        while recommendation_list[recommendation_index][0] in [tpr.recommended for tpr in TrackerPostRecommendation.objects.filter(user=instance.user).order_by('-id')[:10]]:
+        while recommendation_list[recommendation_index] in [tpr.recommended for tpr in TrackerPostRecommendation.objects.filter(user=instance.user).order_by('-id')[:10]]:
                 # selected recommendation alread present in the last 10 recommendations given to the user
             recommendation_index += 1
         
@@ -70,7 +70,7 @@ def generatePostRecommendations(instance):
     # Adding 
     if context in rating_for_context_dic.keys():
         for label, target_rating in label_ratings:
-            recommendation_list.append((label, target_rating+rating_for_context_dic[label.type]), )
+            recommendation_list.append([label, target_rating+rating_for_context_dic[label.type]], )
     else:
         recommendation_list = label_ratings
     recommendation_list.sort(key=lambda x: x[1],reverse=True)
