@@ -24,6 +24,7 @@ def sendPostNotifications(sender, instance, created, **kwargs):
             "title": instance.text, 
             "body": "",
             "post": str(instance.post.id),
+            "survey": False,
         }
     elif instance.post_comment != None:
         data = {
@@ -32,6 +33,7 @@ def sendPostNotifications(sender, instance, created, **kwargs):
             "title": instance.text, 
             "body": instance.post_comment.text,
             "post": str(instance.post.id),
+            "survey": False,
         }
     elif instance.post != None:
         data = {
@@ -40,6 +42,7 @@ def sendPostNotifications(sender, instance, created, **kwargs):
             "title": instance.text, 
             "body": instance.post.title,
             'post':str(instance.post.id),
+            "survey": False,
         }
 
     for device in devices:
