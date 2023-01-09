@@ -3,8 +3,13 @@ from django.contrib import admin
 # Core models
 from .models import Labels, Ratings
 
+class RatingsAdmin(admin.ModelAdmin):
+    search_fields = ('user__username', )
+admin.site.register(Ratings, RatingsAdmin)
+# admin.site.register(Ratings)
+
+
 admin.site.register(Labels)
-admin.site.register(Ratings)
 
 # Tracker models
 from .models import TrackerPostRecommendation, TrackerGroupRecommendation

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from groups.models import GroupsMember
 from notifications.models import Notification
-from recommendations.models import SenderPostRecommendation
+from recommendations.models import SenderPostRecommendation, Ratings
 
 
 User = get_user_model()
@@ -46,3 +46,10 @@ def likeCreatedNotification(sender, instance, created, **kwargs):
     notifications = []
     for group_member in group_members:
         Notification.objects.create(user=group_member.user, post=instance.post, post_comment=None, post_like=instance, text=str(instance.user.username)+" liked a post")
+
+def feadbackCreates(sender, instance, created, **kwargs):    
+    for obj in Ratings.objects.filter(user=instance.user, label=instance.comment.label, is_active=True):
+        obj.is_active = False
+        obj.save()
+    Ratings.objects.create(label=instance.comment.label, user=instance.user, rating=instance.rating)
+ 

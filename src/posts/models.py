@@ -17,6 +17,7 @@ class Post(models.Model):
     link = models.TextField(default="")
     need_feadback = models.BooleanField(default=False, blank=True)
     is_recommendation = models.BooleanField(default=False, blank=True)
+    label = models.ForeignKey('recommendations.labels', models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return str(self.user)+"'s post"
@@ -63,6 +64,7 @@ class PostComment(models.Model):
     link = models.TextField(default='')
     need_feadback = models.BooleanField(default=False, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
+    label = models.ForeignKey('recommendations.labels', models.CASCADE, null=True, blank=True)
 
     def username(self):
         return str(self.user.username)
@@ -116,3 +118,5 @@ import posts.signals as post_signals
 signals.post_save.connect(post_signals.postCreatedNotification, sender=Post)
 signals.post_save.connect(post_signals.commentCreatedNotification, sender=PostComment)
 signals.post_save.connect(post_signals.likeCreatedNotification, sender=PostLike)
+
+signals.post_save.connect(post_signals.feadbackCreates, sender=CommentFeedback)

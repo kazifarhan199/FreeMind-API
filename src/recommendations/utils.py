@@ -26,6 +26,7 @@ def sendPostRecommendations(instance_id):
         need_feadback=True, 
         link=recommendation.link, 
         is_bot=True,
+        label=recommendation,
     )
     
     TrackerPostRecommendation.objects.create(
@@ -73,4 +74,5 @@ def sendGroupRecommendations(instance_id):
         recommendation_scores = [(c.type, c.name, c.id, r) for c, r in recommendation_list] if raw_data!=None else recommendation_list, 
         post=post,
         sender=instance,
+        label=recommendation,
     )
