@@ -1,14 +1,16 @@
 from django.contrib.auth import get_user_model
 from posts.models import Post, PostComment
-from .models import TrackerPostRecommendation, TrackerGroupRecommendation
 from django.conf import settings
+from celery import shared_task
 
+from .models import TrackerPostRecommendation, TrackerGroupRecommendation, SenderPostRecommendation, SenderGroupRecommendation
 from .utils_generator import generatePostRecommendations, generateGroupRecommendations
 
 User = get_user_model()
 
-
-def sendPostRecommendations(instance):
+@shared_task
+def sendPostRecommendations(instance_id):
+    instance = SenderPostRecommendation.objects.get(pk=instance_id)
     post = instance.post
     recommendation, raw_data = generatePostRecommendations(post)
 
@@ -45,7 +47,8 @@ def sendPostRecommendations(instance):
     )
 
 
-def sendGroupRecommendations(instance):
+def sendGroupRecommendations(instance_id):
+    instance = sendGroupRecommendations.obejcts.get(instance_id)
     group = instance.group
     recommendation, raw_data = generateGroupRecommendations(group)
 

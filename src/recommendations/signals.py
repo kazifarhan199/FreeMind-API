@@ -3,12 +3,14 @@ from posts.models import Post
 
 def sendGroupRecommendationsSignal(sender, instance, *args, **kwargs):
     if instance.group:
-        sendGroupRecommendations(instance)
+        sendGroupRecommendations.delay(instance.id)
+        # sendGroupRecommendations(instance)
         return 
     else:
         print("No group specified")
 
 
 def sendPostRecommendationsSignal(sender, instance, *args, **kwargs):
-    sendPostRecommendations(instance)
+    sendPostRecommendations.delay(instance.id)
+
     
