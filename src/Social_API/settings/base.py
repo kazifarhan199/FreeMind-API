@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'posts',
     'notifications',
     'recommendations',
+    'configuration',
 ]
 
 AUTHENTICATION_BACKENDS = ['Social_API.midware.EmailOrUsernameModelBackend', ]

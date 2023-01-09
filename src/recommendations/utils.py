@@ -6,11 +6,15 @@ from groups.models import GroupsMember
 
 from .models import TrackerPostRecommendation, TrackerGroupRecommendation, SenderPostRecommendation, SenderGroupRecommendation
 from .utils_generator import generatePostRecommendations, generateGroupRecommendations
+from configuration.models import Configuration
 
 User = get_user_model()
 
 @shared_task
 def sendPostRecommendations(instance_id):
+    configurations = Configuration.objects.all().order_by('-id').last()
+    assert configurations != None , "\n\n\n\t\t!!!!!Clease create configurations in admin!!!!!\n\n\n."
+
     instance = SenderPostRecommendation.objects.get(pk=instance_id)
     post = instance.post
     recommendation, raw_data = generatePostRecommendations(post)
@@ -21,7 +25,7 @@ def sendPostRecommendations(instance_id):
         nlp_raw_outputs, nlp_context, couple_ratings, rating_for_context_dic, label_ratings, recommendation_list = "None", "None", "None", "None", "None", "None"
 
     comment = PostComment.objects.create(
-        user=User.objects.get(pk=settings.BOT_ID), 
+        user=User.objects.get(pk=configurations.BOT_ID.id), 
         post=post, 
         text=recommendation.reason, 
         need_feadback=True, 
@@ -51,6 +55,9 @@ def sendPostRecommendations(instance_id):
 
 @shared_task
 def sendPostRecommendationsSocial(instance_id):
+    configurations = Configuration.objects.all().order_by('-id').last()
+    assert configurations != None , "\n\n\n\t\t!!!!!Clease create configurations in admin!!!!!\n\n\n."
+
     instance = SenderPostRecommendation.objects.get(pk=instance_id)
     post = instance.post
     group = instance.post.group
@@ -104,7 +111,7 @@ def sendPostRecommendationsSocial(instance_id):
     recommendation = recommendation_list[recommendation_index][0]
 
     comment = PostComment.objects.create(
-        user=User.objects.get(pk=settings.BOT_ID), 
+        user=User.objects.get(pk=configurations.BOT_ID.id), 
         post=post, 
         text=recommendation.reason, 
         need_feadback=True, 
@@ -134,6 +141,10 @@ def sendPostRecommendationsSocial(instance_id):
 
 @shared_task
 def sendGroupRecommendations(instance_id):
+    configurations = Configuration.objects.all().order_by('-id').last()
+    assert configurations != None , "\n\n\n\t\t!!!!!Clease create configurations in admin!!!!!\n\n\n."
+    
+
     instance = SenderGroupRecommendation.objects.get(pk=instance_id)
     group = instance.group
     recommendation, raw_data = generateGroupRecommendations(group)
@@ -144,7 +155,7 @@ def sendGroupRecommendations(instance_id):
         label_ratings_track, recommendation_list = "None", "None"
 
     post = Post.objects.create(
-        user=User.objects.get(pk=settings.BOT_ID),
+        user=User.objects.get(pk=configurations.BOT_ID.id),
         group=group,
         title=recommendation.reason, 
         link=recommendation.link, 
@@ -159,5 +170,4 @@ def sendGroupRecommendations(instance_id):
         recommendation_scores = [(c.type, c.name, c.id, r) for c, r in recommendation_list] if raw_data!=None else recommendation_list, 
         post=post,
         sender=instance,
-        label=recommendation,
     )

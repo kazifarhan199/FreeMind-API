@@ -3,17 +3,23 @@ from django.contrib.auth import get_user_model
 from groups.models import GroupsMember
 from notifications.models import Notification
 from recommendations.models import SenderPostRecommendation, Ratings
+from configuration.models import Configuration
 
 
 User = get_user_model()
 
 def postCreatedNotification(sender, instance, created, **kwargs):
+    configurations = Configuration.objects.all().order_by('-id').last()
+    if configurations != None:
+        print("\n\n\n\t\t\tClease create configurations in admin\n\n\n")
+        return
+        
     if not created:
         # If not a new post
         return
     
     # settings.BOT_ID
-    if instance.user.id == settings.BOT_ID:
+    if instance.user.id == configurations.BOT_ID:
         return
 
     # Sending recommendation
