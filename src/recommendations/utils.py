@@ -46,9 +46,9 @@ def sendPostRecommendations(instance_id):
         sender = instance,
     )
 
-
+@shared_task
 def sendGroupRecommendations(instance_id):
-    instance = sendGroupRecommendations.obejcts.get(instance_id)
+    instance = SenderGroupRecommendation.objects.get(pk=instance_id)
     group = instance.group
     recommendation, raw_data = generateGroupRecommendations(group)
 

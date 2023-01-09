@@ -155,7 +155,7 @@ def generateColleberativeFilteringRecommnedation(user, is_label, is_coupuled, so
     """
 
     ratings = []
-    for rating in Ratings.objects.all():
+    for rating in Ratings.objects.filter(is_active=True):
         ratings.append((rating.user.id, rating.label.id, rating.rating), )
 
     df = pd.DataFrame(ratings, columns=['userId', 'labelsId', 'rating'])
