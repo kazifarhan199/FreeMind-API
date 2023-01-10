@@ -6,14 +6,14 @@ from groups.models import GroupsMember
 
 from .models import TrackerPostRecommendation, TrackerGroupRecommendation, SenderPostRecommendation, SenderGroupRecommendation
 from .utils_generator import generatePostRecommendations, generateGroupRecommendations
-from configuration.models import Configuration
+from configuration.models import Configuration, POST_RECOMMENDATION_TYPE_LIST
 
 User = get_user_model()
 
+
 @shared_task
-def sendPostRecommendations(instance_id):
-    configurations = Configuration.objects.all().order_by('-id').last()
-    assert configurations != None , "\n\n\n\t\t!!!!!Clease create configurations in admin!!!!!\n\n\n."
+def sendPostRecommendations(instance_id, config_id):
+    configurations = Configuration.objects.get(pk=config_id)
 
     instance = SenderPostRecommendation.objects.get(pk=instance_id)
     post = instance.post
@@ -27,7 +27,7 @@ def sendPostRecommendations(instance_id):
     comment = PostComment.objects.create(
         user=User.objects.get(pk=configurations.BOT_ID.id), 
         post=post, 
-        text=recommendation.reason, 
+        text=recommendation.name +' because '+recommendation.reason, 
         need_feadback=True, 
         link=recommendation.link, 
         is_bot=True,
@@ -54,9 +54,8 @@ def sendPostRecommendations(instance_id):
 
 
 @shared_task
-def sendPostRecommendationsSocial(instance_id):
-    configurations = Configuration.objects.all().order_by('-id').last()
-    assert configurations != None , "\n\n\n\t\t!!!!!Clease create configurations in admin!!!!!\n\n\n."
+def sendPostRecommendationsSocial(instance_id, config_id):
+    configurations = Configuration.objects.get(pk=config_id)
 
     instance = SenderPostRecommendation.objects.get(pk=instance_id)
     post = instance.post
@@ -110,15 +109,26 @@ def sendPostRecommendationsSocial(instance_id):
 
     recommendation = recommendation_list[recommendation_index][0]
 
-    comment = PostComment.objects.create(
-        user=User.objects.get(pk=configurations.BOT_ID.id), 
-        post=post, 
-        text=recommendation.reason, 
-        need_feadback=True, 
-        link=recommendation.link, 
-        is_bot=True,
-        label=recommendation,
-    )
+    if configurations.RECOMMENDATION_TYPE == POST_RECOMMENDATION_TYPE_LIST[1][0]:
+        comment = PostComment.objects.create(
+            user=User.objects.get(pk=configurations.BOT_ID.id), 
+            post=post, 
+            text=f"I think you should {recommendation.name} because you and your friends might like it", 
+            need_feadback=True, 
+            link=recommendation.link, 
+            is_bot=True,
+            label=recommendation,
+        )
+    else:
+        comment = PostComment.objects.create(
+            user=User.objects.get(pk=configurations.BOT_ID.id), 
+            post=post, 
+            text=f"I think you should {recommendation.name} because you and your friends might like it and it also {recommendation.reason}", 
+            need_feadback=True, 
+            link=recommendation.link, 
+            is_bot=True,
+            label=recommendation,
+        )
     
     TrackerPostRecommendation.objects.create(
         user=post.user, 
@@ -140,10 +150,8 @@ def sendPostRecommendationsSocial(instance_id):
 
 
 @shared_task
-def sendGroupRecommendations(instance_id):
-    configurations = Configuration.objects.all().order_by('-id').last()
-    assert configurations != None , "\n\n\n\t\t!!!!!Clease create configurations in admin!!!!!\n\n\n."
-    
+def sendGroupRecommendations(instance_id, config_id):
+    configurations = Configuration.objects.get(pk=config_id)    
 
     instance = SenderGroupRecommendation.objects.get(pk=instance_id)
     group = instance.group
