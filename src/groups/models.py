@@ -13,6 +13,7 @@ class Groups(models.Model):
         choices = (('Default', 'Default'), ('Channel', 'Channel')),
         default = 'Default'
     )
+    date_time = models.DateTimeField(auto_now_add=True)
 
     @property
     def is_channel(self):
@@ -28,6 +29,7 @@ class Groups(models.Model):
 class GroupsMember(models.Model):
     group = models.ForeignKey(Groups, models.CASCADE, related_name='members')
     user = models.ForeignKey(User, models.CASCADE)
+    date_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.user)

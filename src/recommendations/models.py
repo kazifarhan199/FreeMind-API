@@ -77,6 +77,9 @@ class TrackerPostRecommendation(models.Model):
     recommended = models.ForeignKey(Labels, models.CASCADE)
     comment = models.ForeignKey(PostComment, models.CASCADE)
 
+    date_time = models.DateTimeField(auto_now_add=True)
+
+
     def __str__(self):
         return str(self.user) +  " == " + str(self.nlp_classification) + " ==> " + str(self.recommended) + " ==> " + str(self.sender.tags)
 
@@ -90,6 +93,9 @@ class TrackerGroupRecommendation(models.Model):
     recommendation_scores = models.TextField()
 
     post = models.ForeignKey(Post, models.CASCADE)
+
+    date_time = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return str(self.group) + " ==> " + str(self.recommended) + " ==> " + str(self.sender.tags)

@@ -10,6 +10,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, models.CASCADE)
     image = models.ImageField(upload_to='image')
     bio = models.TextField(default='')
+    date_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.user)
@@ -20,6 +21,7 @@ class Device(models.Model):
     devicename = models.CharField(max_length=250)
     devicetoken = models.CharField(max_length=250, unique=True)
     devicetype = models.CharField(default='android', max_length=8)
+    date_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.devicetoken

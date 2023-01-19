@@ -16,6 +16,7 @@ class Notification(models.Model):
     show = models.BooleanField(default=True)
     text = models.CharField(max_length=300)
     survey = models.BooleanField(default=False, blank=True)
+    date_time = models.DateTimeField(auto_now_add=True)
 
 
     def __str__(self):

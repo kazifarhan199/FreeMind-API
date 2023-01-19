@@ -43,6 +43,7 @@ class PostImages(models.Model):
 class PostLike(models.Model):
     post = models.ForeignKey(Post, models.CASCADE, related_name='likes')
     user = models.ForeignKey(User, models.CASCADE)
+    date_time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('post', 'user')
@@ -65,6 +66,7 @@ class PostComment(models.Model):
     need_feadback = models.BooleanField(default=False, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
     label = models.ForeignKey('recommendations.labels', models.CASCADE, null=True, blank=True)
+    date_time = models.DateTimeField(auto_now_add=True)
 
     def username(self):
         return str(self.user.username)
@@ -108,6 +110,7 @@ class CommentFeedback(models.Model):
             MinValueValidator(1)
         ]
      )
+    date_time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('comment', 'user')
