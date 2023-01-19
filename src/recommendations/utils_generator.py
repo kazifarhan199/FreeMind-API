@@ -38,7 +38,13 @@ def generatePostRecommendations(instance):
     if label_ratings == None:
         recommendation_list = Labels.objects.filter(is_label=True, is_coupuled=False).order_by('?')
         recommendation_index = 0
-        while recommendation_list[recommendation_index] in [tpr.recommended for tpr in TrackerPostRecommendation.objects.filter(user=instance.user).order_by('-id')[:10]]:
+
+        if TrackerPostRecommendation.objects.filter(user=instance.user).count() > 10:
+            previous_10_recommendation_labels = [tpr.recommended for tpr in TrackerPostRecommendation.objects.filter(user=instance.user).order_by('-id')[:10]]
+        else:
+            previous_10_recommendation_labels = [tpr.recommended for tpr in TrackerPostRecommendation.objects.filter(user=instance.user)]
+
+        while recommendation_list[recommendation_index] in previous_10_recommendation_labels:
                 # selected recommendation alread present in the last 10 recommendations given to the user
             recommendation_index += 1
         
@@ -77,7 +83,13 @@ def generatePostRecommendations(instance):
 
     # Avoid the 10 previously recommended activities
     recommendation_index = 0
-    while recommendation_list[recommendation_index][0] in [tpr.recommended for tpr in TrackerPostRecommendation.objects.filter(user=instance.user).order_by('-id')[:10]]:
+
+    if TrackerPostRecommendation.objects.filter(user=instance.user).count() > 10:
+        previous_10_recommendation_labels = [tpr.recommended for tpr in TrackerPostRecommendation.objects.filter(user=instance.user).order_by('-id')[:10]]
+    else:
+        previous_10_recommendation_labels = [tpr.recommended for tpr in TrackerPostRecommendation.objects.filter(user=instance.user)]
+
+    while recommendation_list[recommendation_index][0] in previous_10_recommendation_labels:
             # selected recommendation alread present in the last 10 recommendations given to the user
         recommendation_index += 1
     
