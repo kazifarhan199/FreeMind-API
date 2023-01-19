@@ -52,6 +52,7 @@ def sendPostRecommendations(instance_id, config_id):
         sender = instance,
 
         recommendation_type=configurations.RECOMMENDATION_TYPE,
+        configurations=configurations,
     )
 
 
@@ -157,6 +158,7 @@ def sendPostRecommendationsSocial(instance_id, config_id):
         sender = instance,
 
         recommendation_type=configurations.RECOMMENDATION_TYPE,
+        configurations=configurations,
     )
 
 
@@ -190,4 +192,5 @@ def sendGroupRecommendations(instance_id, config_id):
         post=post,
         sender=instance,
         recommendation_type=configurations.RECOMMENDATION_TYPE,
+        configurations=configurations,
     )
