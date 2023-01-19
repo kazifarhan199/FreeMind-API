@@ -50,6 +50,8 @@ def sendPostRecommendations(instance_id, config_id):
 
         comment=comment,
         sender = instance,
+
+        recommendation_type=configurations.RECOMMENDATION_TYPE,
     )
 
 
@@ -153,6 +155,8 @@ def sendPostRecommendationsSocial(instance_id, config_id):
 
         comment=comment,
         sender = instance,
+
+        recommendation_type=configurations.RECOMMENDATION_TYPE,
     )
 
 
@@ -185,4 +189,5 @@ def sendGroupRecommendations(instance_id, config_id):
         recommendation_scores = [(c.type, c.name, c.id, r) for c, r in recommendation_list] if raw_data!=None else recommendation_list, 
         post=post,
         sender=instance,
+        recommendation_type=configurations.RECOMMENDATION_TYPE,
     )

@@ -5,6 +5,7 @@ from django.db.models import signals
 
 from posts.models import PostComment, Post
 from groups.models import Groups
+from configuration.models import POST_RECOMMENDATION_TYPE_LIST
 
 User = get_user_model()
 
@@ -79,6 +80,8 @@ class TrackerPostRecommendation(models.Model):
 
     date_time = models.DateTimeField(auto_now_add=True)
 
+    recommendation_type = models.CharField(max_length=100, choices=POST_RECOMMENDATION_TYPE_LIST)
+
 
     def __str__(self):
         return str(self.user) +  " == " + str(self.nlp_classification) + " ==> " + str(self.recommended) + " ==> " + str(self.sender.tags)
@@ -95,6 +98,8 @@ class TrackerGroupRecommendation(models.Model):
     post = models.ForeignKey(Post, models.CASCADE)
 
     date_time = models.DateTimeField(auto_now_add=True)
+
+    recommendation_type = models.CharField(max_length=100, choices=POST_RECOMMENDATION_TYPE_LIST)
 
 
     def __str__(self):
