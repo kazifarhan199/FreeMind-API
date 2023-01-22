@@ -141,3 +141,18 @@ import os
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 BOT_ID = 4
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    # This will chek for all scheduled tasks. It will run every 120 seconds
+    'Scheduled-Recommendations': {
+        'task': 'recommendations.tasks.runScheduledTasks',
+        'schedule': 120.0,
+    },
+    # This will set scheduled tasks 'date_time' parameter to false, so it can run for the next day
+    'Reset-Scheduled': {
+        'task': 'recommendations.tasks.resetScheduledTasks',
+        'schedule':crontab(minute=0, hour=0),
+    }
+}

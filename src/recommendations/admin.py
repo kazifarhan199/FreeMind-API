@@ -25,3 +25,7 @@ class ReadOnlyDateAdmin(admin.ModelAdmin):
 
 admin.site.register(SenderGroupRecommendation, ReadOnlyDateAdmin)
 admin.site.register(SenderPostRecommendation, ReadOnlyDateAdmin)
+
+from .models import ScheduledGroupTaslk
+
+admin.site.register(ScheduledGroupTaslk, ReadOnlyDateAdmin)
