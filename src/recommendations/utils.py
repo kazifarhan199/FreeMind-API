@@ -50,6 +50,9 @@ def sendPostRecommendations(instance_id, config_id):
 
         comment=comment,
         sender = instance,
+
+        recommendation_type=configurations.RECOMMENDATION_TYPE,
+        configurations=configurations,
     )
 
 
@@ -100,8 +103,15 @@ def sendPostRecommendationsSocial(instance_id, config_id):
     
     recommendation_list = recommendation_list_list
     recommendation_index = 0
-    while recommendation_list[recommendation_index][0] in [tpr.recommended for tpr in TrackerGroupRecommendation.objects.filter(group=group).order_by('-id')[:10]]:
-            # selected recommendation alread present in the last 10 recommendations given to the user
+
+    if TrackerGroupRecommendation.objects.filter(group=group).count() > 10:
+        previous_10_recommendation_labels = [tpr.recommended for tpr in TrackerGroupRecommendation.objects.filter(group=group).order_by('-id')[:10]]
+    else:
+        previous_10_recommendation_labels = [tpr.recommended for tpr in TrackerGroupRecommendation.objects.filter(group=group)]
+
+    while recommendation_list[recommendation_index][0] in previous_10_recommendation_labels:
+            # selected recommendation alread present in the last 10 recommendations given to the group 
+            # (as we are combining recommednations for all users in group hrere)
         recommendation_index += 1
     
     if recommendation_index == len(recommendation_list):
@@ -146,6 +156,9 @@ def sendPostRecommendationsSocial(instance_id, config_id):
 
         comment=comment,
         sender = instance,
+
+        recommendation_type=configurations.RECOMMENDATION_TYPE,
+        configurations=configurations,
     )
 
 
@@ -178,4 +191,6 @@ def sendGroupRecommendations(instance_id, config_id):
         recommendation_scores = [(c.type, c.name, c.id, r) for c, r in recommendation_list] if raw_data!=None else recommendation_list, 
         post=post,
         sender=instance,
+        recommendation_type=configurations.RECOMMENDATION_TYPE,
+        configurations=configurations,
     )

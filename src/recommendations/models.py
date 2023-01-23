@@ -5,6 +5,7 @@ from django.db.models import signals
 
 from posts.models import PostComment, Post
 from groups.models import Groups
+from configuration.models import POST_RECOMMENDATION_TYPE_LIST, Configuration
 
 User = get_user_model()
 
@@ -57,7 +58,7 @@ class SenderPostRecommendation(models.Model):
     date_time = models.DateTimeField(auto_now=True, blank=True)
 
     def __str__(self):
-        return str(self.post.user) + " ==> " + str(self.tags)
+        return str(self.post.user) + " ==> " + str(self.tags)    
 
 
 # Tracking models
@@ -77,6 +78,12 @@ class TrackerPostRecommendation(models.Model):
     recommended = models.ForeignKey(Labels, models.CASCADE)
     comment = models.ForeignKey(PostComment, models.CASCADE)
 
+    date_time = models.DateTimeField(auto_now_add=True)
+
+    recommendation_type = models.CharField(max_length=100, choices=POST_RECOMMENDATION_TYPE_LIST)
+
+    configurations = models.ForeignKey(Configuration, models.CASCADE)
+
     def __str__(self):
         return str(self.user) +  " == " + str(self.nlp_classification) + " ==> " + str(self.recommended) + " ==> " + str(self.sender.tags)
 
@@ -91,6 +98,12 @@ class TrackerGroupRecommendation(models.Model):
 
     post = models.ForeignKey(Post, models.CASCADE)
 
+    date_time = models.DateTimeField(auto_now_add=True)
+
+    recommendation_type = models.CharField(max_length=100, choices=POST_RECOMMENDATION_TYPE_LIST)
+
+    configurations = models.ForeignKey(Configuration, models.CASCADE)
+
     def __str__(self):
         return str(self.group) + " ==> " + str(self.recommended) + " ==> " + str(self.sender.tags)
 
@@ -98,3 +111,14 @@ class TrackerGroupRecommendation(models.Model):
 from .signals import sendGroupRecommendationsSignal ,sendPostRecommendationsSignal
 signals.post_save.connect(sendGroupRecommendationsSignal, sender=SenderGroupRecommendation)
 signals.post_save.connect(sendPostRecommendationsSignal, sender=SenderPostRecommendation)
+
+
+class ScheduledGroupTaslk(models.Model):
+    group = models.ForeignKey(Groups, models.CASCADE)
+    time = models.TimeField()
+    done_today = models.BooleanField()
+    date_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.group) + " ==> " + str(self.time)
+ 
