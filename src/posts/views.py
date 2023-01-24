@@ -65,7 +65,8 @@ class ProfilePostListView(ListAPIView):
             user = User.objects.filter(pk=user)
             if user.exists():
                 user = user.first()
-                groups = [gm.group.id for gm in GroupsMember.objects.filter(user=user)] 
+                groups = [gm.group.id for gm in GroupsMember.objects.filter(user=self.request.user)] 
+                # Only show posts common among users
                 queryset = Post.objects.filter(user=user, group__id__in=groups)
                 return queryset.order_by('-created_on')
 
