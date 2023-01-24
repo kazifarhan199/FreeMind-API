@@ -74,11 +74,10 @@ def generatePostRecommendations(instance):
 
     recommendation_list = []
     # Adding 
-    if context in rating_for_context_dic.keys():
-        for label, target_rating in label_ratings:
+    for label, target_rating in label_ratings:
+        if rating_for_context_dic.get(label.type):
             recommendation_list.append([label, target_rating+rating_for_context_dic[label.type]], )
-    else:
-        recommendation_list = label_ratings
+
     recommendation_list.sort(key=lambda x: x[1],reverse=True)
 
     # Avoid the 10 previously recommended activities
