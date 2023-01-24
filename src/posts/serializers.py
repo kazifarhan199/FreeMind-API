@@ -89,6 +89,7 @@ class PostSerializer(serializers.ModelSerializer):
             'group_name',
             'group_image',
             'link',
+            'is_recommendation',
         )
 
 
