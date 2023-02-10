@@ -17,6 +17,9 @@ class Labels(models.Model):
     link = models.CharField(max_length=400)
     is_label = models.BooleanField(default=True)
     is_coupuled = models.BooleanField(default=False)
+    source_based = models.TextField()
+    social_based = models.TextField()
+    hybrid_based = models.TextField()
 
     def __str__(self):
         return f'{self.name}, {self.type}'
