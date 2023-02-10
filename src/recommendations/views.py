@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import permissions
 
 from posts.pagination import PostPageNumberPagination1000
 from . import serializers, models
@@ -47,7 +48,20 @@ class LabelsListView(ListAPIView):
 
 class LabelsCreateView(CreateAPIView):
     serializer_class = serializers.LabelsSerializer
- 
+
+class LablesUpdateView(APIView):
+    permission_classes = [ permissions.AllowAny, ]
+    serializer_class = serializers.LabelsSerializer
+
+    def post(self, request):
+        instance = models.Labels.objects.get(id=request.data['id'])
+        serializer = self.serializer_class(instance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
 class RecommendationsView(APIView):
     permission_classes = (IsAuthenticated, )
 
