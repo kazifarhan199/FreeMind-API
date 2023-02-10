@@ -69,25 +69,27 @@ def generatePostRecommendations(instance):
             else:
                 rating_for_context_dic[couple_target(couple)] = rating
 
+
     # This is for the question that ask about strengths and weaknesses
     # strength_ratings = generateColleberativeFilteringRecommnedation(instance.user, is_label=False, is_coupuled=False)
-
     recommendation_list = []
     # Adding 
     for label, target_rating in label_ratings:
         if rating_for_context_dic.get(label.type):
             recommendation_list.append([label, target_rating+rating_for_context_dic[label.type]], )
+        else:
+            recommendation_list.append([label, target_rating], )
 
     recommendation_list.sort(key=lambda x: x[1],reverse=True)
 
     # Avoid the 10 previously recommended activities
-    recommendation_index = 0
 
     if TrackerPostRecommendation.objects.filter(user=instance.user).count() > 10:
         previous_10_recommendation_labels = [tpr.recommended for tpr in TrackerPostRecommendation.objects.filter(user=instance.user).order_by('-id')[:10]]
     else:
         previous_10_recommendation_labels = [tpr.recommended for tpr in TrackerPostRecommendation.objects.filter(user=instance.user)]
 
+    recommendation_index = 0
     while recommendation_list[recommendation_index][0] in previous_10_recommendation_labels:
             # selected recommendation alread present in the last 10 recommendations given to the user
         recommendation_index += 1
