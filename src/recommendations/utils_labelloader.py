@@ -20,6 +20,7 @@ def load_data():
             'source_based' : row[6],
             'social_based' : row[7],
             'hybrid_based' : row[8],
+            'group_based': row[9],
         }
         i+=1
         resp = requests.post(url, json = data)

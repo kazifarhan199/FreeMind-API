@@ -20,6 +20,7 @@ class Labels(models.Model):
     source_based = models.TextField()
     social_based = models.TextField()
     hybrid_based = models.TextField()
+    group_based = models.TextField()
 
     def __str__(self):
         return f'{self.name}, {self.type}'

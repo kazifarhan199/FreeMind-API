@@ -27,7 +27,7 @@ def sendPostRecommendations(instance_id, config_id):
     comment = PostComment.objects.create(
         user=User.objects.get(pk=configurations.BOT_ID.id), 
         post=post, 
-        text=recommendation.name +' because '+recommendation.reason, 
+        text=recommendation.source_based,
         need_feadback=True, 
         link=recommendation.link, 
         is_bot=True,
@@ -123,7 +123,7 @@ def sendPostRecommendationsSocial(instance_id, config_id):
         comment = PostComment.objects.create(
             user=User.objects.get(pk=configurations.BOT_ID.id), 
             post=post, 
-            text=f"I think you should {recommendation.name} because you and your friends might like it", 
+            text=recommendation.social_based, 
             need_feadback=True, 
             link=recommendation.link, 
             is_bot=True,
@@ -133,7 +133,7 @@ def sendPostRecommendationsSocial(instance_id, config_id):
         comment = PostComment.objects.create(
             user=User.objects.get(pk=configurations.BOT_ID.id), 
             post=post, 
-            text=f"I think you should {recommendation.name} because you and your friends might like it and it also {recommendation.reason}", 
+            text=recommendation.hybrid_based, 
             need_feadback=True, 
             link=recommendation.link, 
             is_bot=True,
@@ -178,7 +178,7 @@ def sendGroupRecommendations(instance_id, config_id):
     post = Post.objects.create(
         user=User.objects.get(pk=configurations.BOT_ID.id),
         group=group,
-        title=recommendation.reason, 
+        title=recommendation.group_based, 
         link=recommendation.link, 
         need_feadback=True, 
         is_recommendation=True,
