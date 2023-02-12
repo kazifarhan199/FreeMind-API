@@ -21,7 +21,7 @@ def postCreatedNotification(sender, instance, created, **kwargs):
     group_members = GroupsMember.objects.filter(group=instance.group).exclude(user=instance.user)
     notifications = []
     for group_member in group_members:
-        Notification.objects.create(object_id=instance.id, send_object=instance.id, type="post", user=group_member.user, title=str(instance.user.username)+" created a new post", body="")
+        Notification.objects.create(object_id=instance.id, send_object=instance.id, type="post", user=group_member.user, title=str(instance.user.username)+" created a new post", body="", creator=instance.user)
 
 
 def commentCreatedNotification(sender, instance, created, **kwargs):
@@ -32,7 +32,7 @@ def commentCreatedNotification(sender, instance, created, **kwargs):
     group_members = GroupsMember.objects.filter(group=instance.post.group).exclude(user=instance.user)
     notifications = []
     for group_member in group_members:
-        Notification.objects.create(object_id=instance.id, send_object=instance.post.id, type="comment", user=group_member.user, title=str(instance.user.username)+" commented on a post", body="")
+        Notification.objects.create(object_id=instance.id, send_object=instance.post.id, type="comment", user=group_member.user, title=str(instance.user.username)+" commented on a post", body="", creator=instance.user)
 
 
 def likeCreatedNotification(sender, instance, created, **kwargs):
@@ -43,7 +43,7 @@ def likeCreatedNotification(sender, instance, created, **kwargs):
     group_members = GroupsMember.objects.filter(group=instance.post.group, user=instance.post.user).exclude(user=instance.user)
     notifications = []
     for group_member in group_members:
-        Notification.objects.create(object_id=instance.id, send_object=instance.post.id, type="like", user=group_member.user, title=str(instance.user.username)+" liked a post", body="")
+        Notification.objects.create(object_id=instance.id, send_object=instance.post.id, type="like", user=group_member.user, title=str(instance.user.username)+" liked a post", body="", creator=instance.user)
 
 
 def feadbackCreates(sender, instance, created, **kwargs):    
