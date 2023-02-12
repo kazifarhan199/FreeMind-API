@@ -5,17 +5,21 @@ from django.contrib.auth import get_user_model
 from posts.models import Post, PostComment, PostLike
 
 User = get_user_model()
+NOTIFICATION_TYPES = (
+    ("post", "post"),
+    ("comment", "comment"),
+    ("like", "like"),
+    ("survey", "survey"),
+    ("reminder", "reminder"),
+)
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_on = models.DateTimeField(auto_now_add=True)
-    post = models.ForeignKey(Post, models.CASCADE, null=True, blank=True)
-    post_comment = models.ForeignKey(PostComment, models.CASCADE, null=True, blank=True)
-    post_like = models.ForeignKey(PostLike, models.CASCADE, null=True, blank=True)
-    seen = models.BooleanField(default=False)
-    show = models.BooleanField(default=True)
-    text = models.CharField(max_length=300)
-    survey = models.BooleanField(default=False, blank=True)
+    object_id = models.IntegerField()
+    send_object = models.IntegerField()
+    type = models.CharField(max_length=100, choices=NOTIFICATION_TYPES)
+    title = models.CharField(max_length=300)
+    body = models.TextField()
     date_time = models.DateTimeField(auto_now_add=True)
 
 
@@ -23,12 +27,9 @@ class Notification(models.Model):
         return str(self.user.username)
 
     def get_user(self):
-        if self.post_comment != None:
-            return self.post_comment.user
-        elif self.post_like != None:
-            return self.post_like.user
-        elif self.post != None:
-            return self.post.user
+        if self.type == "" or self.type == "" or self.type == "":
+            post = Post.objects.get(pk=self.send_object)
+            return post.user
         return None
 
     def username(self):
@@ -43,7 +44,7 @@ class Notification(models.Model):
         if user != None:
             return str(user.image)
         else:
-            if self.survey:
+            if self.type == "survey":
                 return "/media/image/default_profile.jpg"
             else:
                 return "/media/image/default_profile.jpg"
