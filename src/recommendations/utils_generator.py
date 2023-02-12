@@ -126,6 +126,8 @@ def generateGroupRecommendations(group):
     for user in user_list:        
         tmp_label_ratings = generateColleberativeFilteringRecommnedation(user, is_label=True, is_coupuled=False, sorted=False)
         #[(l, r), (l, r), (l, r), (l, r)] -  user 2 ..
+        if not tmp_label_ratings:
+            continue
 
         label_ratings_track[str(user.id)+' '+str(user)] =  [(c.type, c.name, c.id, r) for c, r in tmp_label_ratings]
 
