@@ -190,12 +190,22 @@ class PostCommentView(APIView):
         ).exists():
             return Response({"comment": ["Comment not found."]}, status=status.HTTP_404_NOT_FOUND)
 
+        if not PostComment.objects.filter(
+            pk=request.data.get('comment'),
+            user=request.user, 
+            post=Post.objects.get(
+                pk=request.data.get('post'), 
+                group__in=[gm.group for gm in GroupsMember.objects.filter(user=request.user)]
+            )
+        ).exists():
+            return Response({'detail': ["Can't find the comment.", ]}, status=status.HTTP_404_NOT_FOUND)
+
         PostComment.objects.filter(
             pk=request.data.get('comment'),
             user=request.user, 
             post=Post.objects.get(
                 pk=request.data.get('post'), 
-                group=GroupsMember.objects.filter(user=request.user).first().group
+                group__in=[gm.group for gm in GroupsMember.objects.filter(user=request.user)]
             )
         ).delete()
         return Response({'detail': ["Comment removed.", ]}, status=status.HTTP_202_ACCEPTED)
