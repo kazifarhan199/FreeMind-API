@@ -138,7 +138,7 @@ def dataToSleep(data):
     #0.1-0.9: maybe 0.7: if activity level is already high you don't want to suggest the user to do more of the activity
     #1.1-1.9: maybe 1.3: if activity level is low you want to suggest the user to do more of the activity
 def dataAnalysisDaily(curr_obj_data): 
-    reason = ""
+    reason = "Based on your available activity data, "
     dict_ActivityMultiplicity ={ 'exercise':None, 'food':None, 'stress':None, 'general':1, 'sleep':None}
 
     # logic to do the Analysis
@@ -146,21 +146,28 @@ def dataAnalysisDaily(curr_obj_data):
     
     #STEPS and CALORIES Analysis
     if((curr_obj_data.steps==None or curr_obj_data.steps==0) and (curr_obj_data.activeKilocalories==0 or curr_obj_data.activeKilocalories==None)):
-        reason = reason + "Your calories and steps have not been measured. "
+        reason = reason + "it appears that your calorie intake and step count have not been measured. To gain a more comprehensive understanding of your activity and nutrition, it is recommended that you track these metrics consistently. "
     else:
         if(curr_obj_data.activeKilocalories >= 300 or (curr_obj_data.steps>= 2000 and curr_obj_data.steps<=5000)):
             dict_ActivityMultiplicity['exercise']=0.9
             dict_ActivityMultiplicity['food']=1.1
-            reason = reason + "You have done enough exercise for the day, consume nutritous food. "
+            #print(curr_obj_data.activeKilocalories, curr_obj_data.steps)
+            reason = reason + "it appears that you have engaged in a sufficient amount of exercise for the day. It is recommended that you now focus on consuming a well-balanced and nutritious diet to support your physical activity and overall health. "
         elif(curr_obj_data.activeKilocalories >= 500 or curr_obj_data.steps> 5000 ):
             dict_ActivityMultiplicity['exercise']=0.7
             dict_ActivityMultiplicity['food']=1.3
-            reason = reason + "You have perfored high levels of exercise, consume nutriouse food to gain the benefit of exercising "
+            #print(curr_obj_data.activeKilocalories, curr_obj_data.steps)
+            reason = reason + "it appears that you have engaged in high levels of exercise. To fully reap the benefits of your exercise, it is recommended that you consume a well-balanced and nutritious diet. Adequate nutrition can help support your physical activity and overall health. "
+        else:
+            dict_ActivityMultiplicity['exercise']=1.3
+            dict_ActivityMultiplicity['food']=0.9
+            print(curr_obj_data.activeKilocalories, curr_obj_data.steps)
+            reason = reason + "it appears that you have not engaged in a substantial amount of physical activity today. It is recommended that you consider incorporating more physical activity into your daily routine for optimal health and well-being. "
 
     # STRESS Analysis 
     dictStressQualifiers = {'stressfull':1.3, 'unknown':1, 'balanced': 1} 
     if(curr_obj_data.stressQualifier == "unknown"):
-        reason = reason + "Stress is not measured, please make sure the watch is on your wrist all the time to ensure right measurements. "
+        reason = reason + "Also, your stress levels have not been measured. Tracking your stress levels can provide valuable insights into your overall well-being and can help inform potential lifestyle adjustments. It is recommended that you consider incorporating stress tracking into your routine. "
     else:
         reason = reason + "Your stress level is analysed as " + curr_obj_data.stressQualifier + ". "
     dict_ActivityMultiplicity['stress']=dictStressQualifiers[curr_obj_data.stressQualifier]
