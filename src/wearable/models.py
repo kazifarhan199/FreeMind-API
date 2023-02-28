@@ -70,7 +70,7 @@ class DailyData(models.Model):
     #     unique_together = (("userid", "userAccessToken","calendarDate"),)
     #     index_together = (("userid", "userAccessToken","calendarDate"),)
     def __str__(self):
-        return f'Garmin data collected at {self.timestamp}'
+        return f'Garmin data collected at {self.timestamp} == {self.is_active}'
 
 # model to store filtered  data
 class SleepData(models.Model):
@@ -92,4 +92,4 @@ class SleepData(models.Model):
     #     index_together = ("userid", "userAccessToken","calendarDate")
 
     def __str__(self):
-        return f'Garmin data collected at {self.timestamp}'
+        return f'Garmin data collected at {self.timestamp} == {self.is_active}'
