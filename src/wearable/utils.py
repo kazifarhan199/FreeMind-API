@@ -1,4 +1,5 @@
 from . import models
+from datetime import date
 
 # saving raw daily data from garmin (can be used to refer back to, if need be)     
 def save_garmin_daily_data_to_db(data):
@@ -50,7 +51,10 @@ def dataToDailies(data):
     try:
         # Create or retrieve the instance from the db
         #  data = {'dailies': [ {'userId': ... } { } { } ]} 
+        today=date.today()
         dailiesList=data['dailies']
+        print(dailiesList==None)
+        print(dailiesList)
         for day in dailiesList:
             filter= models.DailyData.objects.filter(is_active=True, userId = day.get('userId'),userAccessToken=day.get('userAccessToken'),calendarDate=day.get('calendarDate'))
             if(filter.exists()):
@@ -59,8 +63,12 @@ def dataToDailies(data):
                     i.is_active=False
                     i.save()
             #create a instance in the DB
+            #print(str(today))
+            #print(str(day.get('calendarDate')))
+            #print(True if (str(today)==str(day.get('calendarDate'))) else False)
             instance = models.DailyData.objects.create(
                 
+                is_active= True if (str(today)==str(day.get('calendarDate'))) else False,
                 userId = day.get('userId'),
                 userAccessToken=day.get('userAccessToken'),
                 summaryId=day.get('summaryId'),
@@ -90,6 +98,10 @@ def dataToDailies(data):
             # how will that be handled
             
         #this block will filter the latest data of the user in question and makes a call to the analysis function
+
+        # Alternative
+        # models.DailyData.objects.filter(userId = day.get('userId'),userAccessToken=day.get('userAccessToken'),calendarDate=day.get('calendarDate')).order_by('-id').last()
+        
         filter= models.DailyData.objects.filter(is_active=True, userId = day.get('userId'),userAccessToken=day.get('userAccessToken'),calendarDate=day.get('calendarDate'))
         if(filter.exists()):
             for curr_obj in filter:
@@ -105,6 +117,7 @@ def dataToSleep(data):
     
     try:
         sleepList=data['sleeps']
+        today=date.today()
         for sleep in sleepList:
             filter= models.SleepData.objects.filter(is_active=True, userId = sleep.get('userId'),userAccessToken=sleep.get('userAccessToken'),calendarDate=sleep.get('calendarDate'))
             if(filter.exists()):
@@ -113,7 +126,8 @@ def dataToSleep(data):
                     i.is_active=False
                     i.save()
             # Create a instance in the db
-            instance = models.SleepData.objects.create(               
+            instance = models.SleepData.objects.create( 
+                is_active= True if (str(today)==str(day.get('calendarDate'))) else False,              
                 userId = sleep.get('userId'),
                 userAccessToken=sleep.get('userAccessToken'),
                 summaryId=sleep.get('summaryId'),
@@ -179,18 +193,23 @@ def dataAnalysisDaily(curr_obj_data):
 def dataAnalysisSleep(curr_obj_data):
     filter= models.SleepData.objects.filter(is_active=True, userId = curr_obj_data.userId,userAccessToken=curr_obj_data.userAccessToken,calendarDate=curr_obj_data.calendarDate)
     reason = ""
+    sleep=1
     if(filter.exists()):
         if(filter.first().durationInSeconds >= 25200):
             if(filter.first().overallSleepScorequalifierKey != "unknown"):
                 reason = reason + "You had enough sleep and the quality of sleep is " +  filter.first().overallSleepScorequalifierKey + ". "
+                sleep= 1.5
             else:
                 reason = reason + "You had enough sleep. "
+                sleep=1
         else:
             reason = reason + "Also you should take rest as you had less than 7 hours of sleep. "
+            sleep=2
     else:
         reason = reason + "Sleep is not measured. "
+        sleep=1
     
-    return reason
+    return sleep, reason
 
 
 #think about how to return the reason?
@@ -200,7 +219,9 @@ def dataAnalysisSleep(curr_obj_data):
 def dataAnalysis(curr_obj_data, _type):
     if(_type=='daily'):
         dict, reason = dataAnalysisDaily(curr_obj_data)
-        reason = reason + dataAnalysisSleep(curr_obj_data)
+        sleep, sleepreason = dataAnalysisSleep(curr_obj_data)
+        reason = reason + sleepreason
+        dict['sleep']=sleep
         print(reason, dict.keys(), dict.values())
     #communicate to recommendation system
     
