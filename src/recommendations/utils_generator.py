@@ -191,3 +191,10 @@ def generateColleberativeFilteringRecommnedation(user, is_label, is_coupuled, so
         est_ratings.sort(key=lambda x: x[1],reverse=True)
     
     return est_ratings
+
+def generateWearableRecommendations(group):
+    recommenation, (label_ratings_track, recommendation_list) =  generateGroupRecommendations(group)
+
+    # recommendation_list
+
+    return recommenation, (label_ratings_track, recommendation_list)

@@ -4,8 +4,8 @@ from django.conf import settings
 from celery import shared_task
 from groups.models import GroupsMember
 
-from .models import TrackerPostRecommendation, TrackerGroupRecommendation, SenderPostRecommendation, SenderGroupRecommendation
-from .utils_generator import generatePostRecommendations, generateGroupRecommendations
+from .models import TrackerPostRecommendation, TrackerGroupRecommendation, SenderPostRecommendation, SenderGroupRecommendation, TrackerWearableRecommendation, SenderWearableRecommendation
+from .utils_generator import generatePostRecommendations, generateGroupRecommendations, generateWearableRecommendations
 from configuration.models import Configuration, POST_RECOMMENDATION_TYPE_LIST
 
 User = get_user_model()
@@ -185,6 +185,40 @@ def sendGroupRecommendations(instance_id, config_id):
     )
 
     TrackerGroupRecommendation.objects.create(
+        group=group,
+        recommended=recommendation,
+        recommendation_tree= label_ratings_track, 
+        recommendation_scores = [(c.type, c.name, c.id, r) for c, r in recommendation_list] if raw_data!=None else recommendation_list, 
+        post=post,
+        sender=instance,
+        recommendation_type=configurations.RECOMMENDATION_TYPE,
+        configurations=configurations,
+    )
+
+
+@shared_task
+def sendWearableRecommendations(instance_id, config_id):
+    configurations = Configuration.objects.get(pk=config_id)    
+
+    instance = SenderWearableRecommendation.objects.get(pk=instance_id)
+    group = instance.group
+    recommendation, raw_data = generateWearableRecommendations(group)
+
+    if raw_data != None:
+        label_ratings_track, recommendation_list = raw_data
+    else:
+        label_ratings_track, recommendation_list = "None", "None"
+
+    post = Post.objects.create(
+        user=User.objects.get(pk=configurations.BOT_ID.id),
+        group=group,
+        title=recommendation.reason, 
+        link=recommendation.link, 
+        need_feadback=True, 
+        is_recommendation=True,
+    )
+
+    TrackerWearableRecommendation.objects.create(
         group=group,
         recommended=recommendation,
         recommendation_tree= label_ratings_track, 

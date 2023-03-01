@@ -1,4 +1,4 @@
-from .utils import sendPostRecommendations, sendGroupRecommendations, sendPostRecommendationsSocial
+from .utils import sendPostRecommendations, sendGroupRecommendations, sendPostRecommendationsSocial, sendWearableRecommendations
 from posts.models import Post
 from configuration.models import Configuration, POST_RECOMMENDATION_TYPE_LIST
 
@@ -12,29 +12,49 @@ def sendGroupRecommendationsSignal(sender, instance, *args, **kwargs):
     config_id = configurations.id
 
     if instance.group:
-        sendGroupRecommendations.delay(instance.id, config_id)
-        # sendGroupRecommendations(instance)
+        # sendGroupRecommendations.delay(instance.id, config_id)
+        sendGroupRecommendations(instance.id, config_id)
         return 
     else:
         print("No group specified")
 
 
-def sendPostRecommendationsSignal(sender, instance, *args, **kwargs):
-    configurations = Configuration.objects.filter(group=instance.post.group).order_by('-id').first()
+def sendWearableRecommendationsSignal(sender, instance, *args, **kwargs):
+    configurations = Configuration.objects.filter(group=instance.group).order_by('-id').first()
     if configurations == None:
         print("\n\n\n\t\t!!!!!Clease create configurations in admin!!!!!\n\n\n.")
         configurations = Configuration.objects.all().order_by('-id').first()
-
     print(configurations)
     config_id = configurations.id
 
-    if configurations.RECOMMENDATION_TYPE == POST_RECOMMENDATION_TYPE_LIST[0][0]: # Source
-        sendPostRecommendations.delay(instance.id, config_id)
+    if instance.group:
+        # sendWearableRecommendations.delay(instance.id, config_id)
+        sendWearableRecommendations(instance.id, config_id)
+        return 
+    else:
+        print("No group specified")
 
-    if configurations.RECOMMENDATION_TYPE == POST_RECOMMENDATION_TYPE_LIST[1][0]: # Social
-        sendPostRecommendationsSocial.delay(instance.id, config_id)
+def sendPostRecommendationsSignal(sender, instance, *args, **kwargs):
+    # configurations = Configuration.objects.filter(group=instance.post.group).order_by('-id').first()
+    # if configurations == None:
+    #     print("\n\n\n\t\t!!!!!Clease create configurations in admin!!!!!\n\n\n.")
+    configurations = Configuration.objects.all().order_by('-id').first()
 
-    if configurations.RECOMMENDATION_TYPE == POST_RECOMMENDATION_TYPE_LIST[2][0]: # Hybread
-        sendPostRecommendationsSocial.delay(instance.id, config_id)
+
+    # print(configurations)
+
+    config_id = configurations.id
+
+    sendPostRecommendations.delay(instance.id, config_id)
+
+
+    # if configurations.RECOMMENDATION_TYPE == POST_RECOMMENDATION_TYPE_LIST[0][0]: # Source
+    #     sendPostRecommendations.delay(instance.id, config_id)
+
+    # if configurations.RECOMMENDATION_TYPE == POST_RECOMMENDATION_TYPE_LIST[1][0]: # Social
+    #     sendPostRecommendationsSocial.delay(instance.id, config_id)
+
+    # if configurations.RECOMMENDATION_TYPE == POST_RECOMMENDATION_TYPE_LIST[2][0]: # Hybread
+    #     sendPostRecommendationsSocial.delay(instance.id, config_id)
 
     

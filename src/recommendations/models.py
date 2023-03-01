@@ -51,7 +51,16 @@ class SenderGroupRecommendation(models.Model):
 
     def __str__(self):
         return str(self.group) + " ==> " + str(self.tags)
+    
 
+class SenderWearableRecommendation(models.Model):
+    group = models.ForeignKey(Groups, models.CASCADE, null=True, blank=True)
+    tags = models.CharField(max_length=300)
+    date_time = models.DateTimeField(auto_now=True, blank=True)
+
+    def __str__(self):
+        return str(self.group) + " ==> " + str(self.tags)
+    
 class SenderPostRecommendation(models.Model):
     post = models.ForeignKey(Post, models.CASCADE)
     tags = models.CharField(max_length=300)
@@ -108,8 +117,28 @@ class TrackerGroupRecommendation(models.Model):
         return str(self.group) + " ==> " + str(self.recommended) + " ==> " + str(self.sender.tags)
 
 
-from .signals import sendGroupRecommendationsSignal ,sendPostRecommendationsSignal
+class TrackerWearableRecommendation(models.Model):
+    group = models.ForeignKey(Groups, models.CASCADE)
+    recommended = models.ForeignKey(Labels, models.CASCADE)
+    sender = models.ForeignKey(SenderGroupRecommendation, models.CASCADE)
+
+    recommendation_tree = models.TextField()
+    recommendation_scores = models.TextField()
+
+    post = models.ForeignKey(Post, models.CASCADE)
+
+    date_time = models.DateTimeField(auto_now_add=True)
+
+    recommendation_type = models.CharField(max_length=100, choices=POST_RECOMMENDATION_TYPE_LIST)
+
+    configurations = models.ForeignKey(Configuration, models.CASCADE)
+
+    def __str__(self):
+        return str(self.group) + " ==> " + str(self.recommended) + " ==> " + str(self.sender.tags)
+
+from .signals import sendGroupRecommendationsSignal ,sendPostRecommendationsSignal, sendWearableRecommendationsSignal
 signals.post_save.connect(sendGroupRecommendationsSignal, sender=SenderGroupRecommendation)
+signals.post_save.connect(sendWearableRecommendationsSignal, sender=SenderWearableRecommendation)
 signals.post_save.connect(sendPostRecommendationsSignal, sender=SenderPostRecommendation)
 
 
