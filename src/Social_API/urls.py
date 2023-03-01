@@ -12,6 +12,7 @@ urlpatterns = [
     path('groups/', include('groups.urls')),
     path('posts/', include('posts.urls')),
     path('notifications/', include('notifications.urls')),
+    path('wearable/', include('wearable.urls')),
     path('recommendations/', include('recommendations.urls')),
     re_path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),

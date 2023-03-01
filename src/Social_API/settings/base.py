@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'notifications',
     'recommendations',
     'configuration',
+    'wearable',
 ]
 
 AUTHENTICATION_BACKENDS = ['Social_API.midware.EmailOrUsernameModelBackend', ]
