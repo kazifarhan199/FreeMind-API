@@ -149,7 +149,7 @@ CELERY_BEAT_SCHEDULE = {
     # This will chek for all scheduled tasks. It will run every 120 seconds
     'Scheduled-Recommendations': {
         'task': 'recommendations.tasks.runScheduledTasks',
-        'schedule': 120.0,
+        'schedule': 20.0,
     },
     # This will set scheduled tasks 'date_time' parameter to false, so it can run for the next day
     'Reset-Scheduled': {
