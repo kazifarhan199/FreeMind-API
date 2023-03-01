@@ -43,7 +43,7 @@ class LabelsListView(ListAPIView):
         if len(models.Ratings.objects.filter(user=self.request.user)) > 20:
             queryset = models.Labels.objects.filter(is_label=True).order_by("?")[:3]
         else:
-            queryset = models.Labels.objects.filter(is_label=True).order_by('?')[:15]
+            queryset = models.Labels.objects.filter(is_label=True).order_by('?')[:20]
         return queryset
 
 class LabelsCreateView(CreateAPIView):
