@@ -1,0 +1,25 @@
+for u in users:
+    if 'user' in u.username:
+        pass
+    elif 'John_Doe' in u.username:
+        pass
+    elif u.username in ['js', 'putta012', 'Zoha', 'kazi']:
+        pass
+    else:
+        u.delete()
+
+
+
+users before deleting - 102
+users before deleting - 87
+
+
+for u in users:
+    if 'user' in u.username:
+        if int(u.username.split('user')[-1]) > 21:
+            u.delete()
+    elif 'John_Doe' in u.username:
+        if int(u.username.split('John_Doe')[-1]) > 21:
+            u.delete()
+
+users after deleting - 46
