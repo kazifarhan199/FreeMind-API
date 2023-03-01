@@ -9,7 +9,7 @@ Step 2
     `cd src`
 
 Step 3
-    `gunicorn Social_API.wsgi:application -b:59000 &`
+    `gunicorn Social_API.wsgi:application -b:59000 --daemon`
 
 Step 4
     `celery --app=Social_API worker -l INFO --concurrency=1 &`
