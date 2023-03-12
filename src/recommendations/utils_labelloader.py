@@ -1,13 +1,14 @@
 import pandas as pd
 import requests
 
-url = 'http://localhost:59000/recommendations/label/edit/'
+url = 'http://localhost:59000/recommendations/label/create/'
 
 def load_data():
     file_path = input("Enter the path to the file to load: ")
     df = pd.read_csv(file_path)
     df = df.fillna('.')
     i = 1
+    token = input("Enter token : ")
     for row in df.values:
         data = {
             'id': i,
@@ -23,5 +24,8 @@ def load_data():
             'group_based': row[9],
         }
         i+=1
-        resp = requests.post(url, json = data)
+        headers = {"Content-Type": "application/json; charset=utf-8", 'Authorization': f'Token {token}', 'Device': 'token'}
+        resp = requests.post(url, json = data, headers=headers)
         print(resp, '--', resp.text)
+
+load_data()
