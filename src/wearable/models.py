@@ -39,7 +39,7 @@ class GarminSleepData(models.Model):
 # model to store filtered  data
 class DailyData(models.Model):
     is_active=models.BooleanField(default=True)
-    userId =models.CharField(max_length=500)
+    garminUserId =models.CharField(max_length=500)
     userAccessToken=models.CharField(max_length=500)
     summaryId=models.CharField(max_length=500)
     calendarDate=models.DateField()
@@ -75,7 +75,7 @@ class DailyData(models.Model):
 # model to store filtered  data
 class SleepData(models.Model):
     is_active=models.BooleanField(default=True)
-    userId =models.CharField(max_length=500)
+    garminUserId =models.CharField(max_length=500)
     userAccessToken=models.CharField(max_length=500)
     summaryId=models.CharField(max_length=500)
     calendarDate=models.DateField()
@@ -85,6 +85,7 @@ class SleepData(models.Model):
     overallSleepScorequalifierKey = models.CharField(max_length=200, null=True)
 
     timestamp = models.DateTimeField(auto_now_add=True)
+
     
     # setting up unique keys to support receiving data for the same and not have duplicate records of same day (to aloow for update instead)
     # class Meta:
@@ -93,3 +94,11 @@ class SleepData(models.Model):
 
     def __str__(self):
         return f'Garmin data collected at {self.timestamp} == {self.is_active}'
+    
+
+class UserIdMap(models.Model):
+    garminUserId=models.CharField(max_length=500)
+    user=models.ForeignKey(User, models.CASCADE)
+
+    def __str__(self):
+        return f'garmin user mapped with django user {self.garminUserId} == {self.user}'
