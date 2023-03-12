@@ -201,8 +201,8 @@ def sendWearableRecommendations(instance_id, config_id):
     configurations = Configuration.objects.get(pk=config_id)    
 
     instance = SenderWearableRecommendation.objects.get(pk=instance_id)
-    group = instance.group
-    recommendation, raw_data = generateWearableRecommendations(group)
+    user = instance.user
+    recommendation, raw_data = generateWearableRecommendations(user)
 
     if raw_data != None:
         label_ratings_track, recommendation_list = raw_data
@@ -211,7 +211,7 @@ def sendWearableRecommendations(instance_id, config_id):
 
     post = Post.objects.create(
         user=User.objects.get(pk=configurations.BOT_ID.id),
-        group=group,
+        group=instance.user.group,
         title=recommendation.reason, 
         link=recommendation.link, 
         need_feadback=True, 

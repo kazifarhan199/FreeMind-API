@@ -1,62 +1,67 @@
 from . import models
 from datetime import date
+from recommendations.models import SenderWearableRecommendation
+
+from django.contrib.auth import get_user_model
+
+User=get_user_model()
 
 # saving raw daily data from garmin (can be used to refer back to, if need be)     
 def save_garmin_daily_data_to_db(data):
     # Create or update the data in the database
-    try:
+    # try:
         # Create or retrieve the instance from the db
         instance = models.GarminDailyData.objects.create(
                 data=data
             )
         # save the instance
         instance.save()
-    except Exception as e:
-        # handle the exception
-        print(f'Error saving data: {e}')    
+    # except Exception as e:
+    #     # handle the exception
+    #     print(f'Error saving data: {e}')    
 
 
 # saving raw stress data from garmin (can be used to refer back to, if need be)
 def save_garmin_stress_data_to_db(data):
     # Create or update the data in the database
-    try:
+    # try:
         # Create or retrieve the instance from the db
         instance = models.GarminStressData.objects.create(
                 data=data
             )
         # save the instance
         instance.save()
-    except Exception as e:
-        # handle the exception
-        print(f'Error saving data: {e}')    
+    # except Exception as e:
+    #     # handle the exception
+    #     print(f'Error saving data: {e}')    
 
 # saving raw sleep data from garmin (can be used to refer back to, if need be)
 def save_garmin_sleep_data_to_db(data):
     # Create or update the data in the database
-    try:
+    # try:
         # Create or retrieve the instance from the db
         instance = models.GarminSleepData.objects.create(
                 data=data
             )
         # save the instance
         instance.save()
-    except Exception as e:
-        # handle the exception
-        print(f'Error saving data: {e}')    
+    # except Exception as e:
+    #     # handle the exception
+    #     print(f'Error saving data: {e}')    
 
 
 # saving daily data from garmin (just the columns needed instead of all the data)
 def dataToDailies(data):
     
-    try:
+    # try:
         # Create or retrieve the instance from the db
         #  data = {'dailies': [ {'userId': ... } { } { } ]} 
         today=date.today()
         dailiesList=data['dailies']
-        print(dailiesList==None)
-        print(dailiesList)
+        #print(dailiesList==None)
+        #print(dailiesList)
         for day in dailiesList:
-            filter= models.DailyData.objects.filter(is_active=True, userId = day.get('userId'),userAccessToken=day.get('userAccessToken'),calendarDate=day.get('calendarDate'))
+            filter= models.DailyData.objects.filter(is_active=True, garminUserId = day.get('userId'),userAccessToken=day.get('userAccessToken'),calendarDate=day.get('calendarDate'))
             if(filter.exists()):
 
                 for i in filter:
@@ -69,7 +74,7 @@ def dataToDailies(data):
             instance = models.DailyData.objects.create(
                 
                 is_active= True if (str(today)==str(day.get('calendarDate'))) else False,
-                userId = day.get('userId'),
+                garminUserId = day.get('userId'),
                 userAccessToken=day.get('userAccessToken'),
                 summaryId=day.get('summaryId'),
                 calendarDate=day.get('calendarDate'),
@@ -100,26 +105,29 @@ def dataToDailies(data):
         #this block will filter the latest data of the user in question and makes a call to the analysis function
 
         # Alternative
-        # models.DailyData.objects.filter(userId = day.get('userId'),userAccessToken=day.get('userAccessToken'),calendarDate=day.get('calendarDate')).order_by('-id').last()
+        filter=models.DailyData.objects.filter(is_active=True,garminUserId = dailiesList[0].get('userId'),userAccessToken=dailiesList[0].get('userAccessToken')).order_by('-calendarDate').first()
         
-        filter= models.DailyData.objects.filter(is_active=True, userId = day.get('userId'),userAccessToken=day.get('userAccessToken'),calendarDate=day.get('calendarDate'))
-        if(filter.exists()):
-            for curr_obj in filter:
-                dataAnalysis(curr_obj, _type='daily')
+        #filter= models.DailyData.objects.filter(is_active=True, userId = day.get('userId'),userAccessToken=day.get('userAccessToken'),calendarDate=day.get('calendarDate'))
+        if(filter):
+            #for curr_obj in filter:
+            print("OBJECT")
+            print(filter.garminUserId, filter.calendarDate)
+            print("OBJECT DONE")
+            dataAnalysis(filter, _type='daily')
             
             
-    except Exception as e:
-        # handle the exception
-        print(f'Error saving data: {e}') 
+    # except Exception as e:
+    #     # handle the exception
+    #     print(f'Error saving data: {e}') 
 
 # saving sleep data from garmin (just the columns needed instead of all the data)
 def dataToSleep(data):
     
-    try:
+    # try:
         sleepList=data['sleeps']
         today=date.today()
         for sleep in sleepList:
-            filter= models.SleepData.objects.filter(is_active=True, userId = sleep.get('userId'),userAccessToken=sleep.get('userAccessToken'),calendarDate=sleep.get('calendarDate'))
+            filter= models.SleepData.objects.filter(is_active=True, garminUserId = sleep.get('userId'),userAccessToken=sleep.get('userAccessToken'),calendarDate=sleep.get('calendarDate'))
             if(filter.exists()):
 
                 for i in filter:
@@ -127,8 +135,8 @@ def dataToSleep(data):
                     i.save()
             # Create a instance in the db
             instance = models.SleepData.objects.create( 
-                is_active= True if (str(today)==str(day.get('calendarDate'))) else False,              
-                userId = sleep.get('userId'),
+                is_active= True if (str(today)==str(sleep.get('calendarDate'))) else False,              
+                garminUserId = sleep.get('userId'),
                 userAccessToken=sleep.get('userAccessToken'),
                 summaryId=sleep.get('summaryId'),
                 calendarDate=sleep.get('calendarDate'),
@@ -141,9 +149,9 @@ def dataToSleep(data):
             # before calling the function what if both sleep and daily have new data at the same time
             # how will that be handled
             
-    except Exception as e:
-        # handle the exception
-        print(f'Error saving data: {e}') 
+    # except Exception as e:
+    #     # handle the exception
+    #     print(f'Error saving data: {e}') 
 
 # the function Does the data analysis before trying to alter the recommendation list
 
@@ -179,7 +187,7 @@ def dataAnalysisDaily(curr_obj_data):
             reason = reason + "it appears that you have not engaged in a substantial amount of physical activity today. It is recommended that you consider incorporating more physical activity into your daily routine for optimal health and well-being. "
 
     # STRESS Analysis 
-    dictStressQualifiers = {'stressfull':1.3, 'unknown':1, 'balanced': 1} 
+    dictStressQualifiers = {'stressfull':1.5, 'unknown':1, 'balanced': 1.3, 'calm':1} 
     if(curr_obj_data.stressQualifier == "unknown"):
         reason = reason + "Also, your stress levels have not been measured. Tracking your stress levels can provide valuable insights into your overall well-being and can help inform potential lifestyle adjustments. It is recommended that you consider incorporating stress tracking into your routine. "
     else:
@@ -191,7 +199,7 @@ def dataAnalysisDaily(curr_obj_data):
 
 
 def dataAnalysisSleep(curr_obj_data):
-    filter= models.SleepData.objects.filter(is_active=True, userId = curr_obj_data.userId,userAccessToken=curr_obj_data.userAccessToken,calendarDate=curr_obj_data.calendarDate)
+    filter= models.SleepData.objects.filter(is_active=True, garminUserId = curr_obj_data.garminUserId,userAccessToken=curr_obj_data.userAccessToken,calendarDate=curr_obj_data.calendarDate)
     reason = ""
     sleep=1
     if(filter.exists()):
@@ -223,6 +231,19 @@ def dataAnalysis(curr_obj_data, _type):
         reason = reason + sleepreason
         dict['sleep']=sleep
         print(reason, dict.keys(), dict.values())
+'''
+        models.SleepData.objects.create( 
+            reason = models.CharField(max_length=3000)
+            sleep = dict['sleep']
+            stress = dict['stress']
+            food = dict['food']
+            exercise = dict['exercise']
+            general = dict['general']
+            user= models.UserIdMap.get(garminUserId=curr_obj_data.garminUserId).user
+        )
+        instance.save()
+
+'''        
     #communicate to recommendation system
     
     # create 1-5/0.1-1.9 scale for each activity and then increase or decrease the multiplicty of the type accordingly

@@ -27,7 +27,7 @@ def sendWearableRecommendationsSignal(sender, instance, *args, **kwargs):
     print(configurations)
     config_id = configurations.id
 
-    if instance.group:
+    if instance.user:
         # sendWearableRecommendations.delay(instance.id, config_id)
         sendWearableRecommendations(instance.id, config_id)
         return 
@@ -35,26 +35,22 @@ def sendWearableRecommendationsSignal(sender, instance, *args, **kwargs):
         print("No group specified")
 
 def sendPostRecommendationsSignal(sender, instance, *args, **kwargs):
-    # configurations = Configuration.objects.filter(group=instance.post.group).order_by('-id').first()
-    # if configurations == None:
-    #     print("\n\n\n\t\t!!!!!Clease create configurations in admin!!!!!\n\n\n.")
+    configurations = Configuration.objects.filter(group=instance.post.group).order_by('-id').first()
+    if configurations == None:
+        print("\n\n\n\t\t!!!!!Clease create configurations in admin!!!!!\n\n\n.")
     configurations = Configuration.objects.all().order_by('-id').first()
 
 
-    # print(configurations)
-
     config_id = configurations.id
 
-    sendPostRecommendations.delay(instance.id, config_id)
 
+    if configurations.RECOMMENDATION_TYPE == POST_RECOMMENDATION_TYPE_LIST[0][0]: # Source
+        sendPostRecommendations.delay(instance.id, config_id)
 
-    # if configurations.RECOMMENDATION_TYPE == POST_RECOMMENDATION_TYPE_LIST[0][0]: # Source
-    #     sendPostRecommendations.delay(instance.id, config_id)
+    if configurations.RECOMMENDATION_TYPE == POST_RECOMMENDATION_TYPE_LIST[1][0]: # Social
+        sendPostRecommendationsSocial.delay(instance.id, config_id)
 
-    # if configurations.RECOMMENDATION_TYPE == POST_RECOMMENDATION_TYPE_LIST[1][0]: # Social
-    #     sendPostRecommendationsSocial.delay(instance.id, config_id)
-
-    # if configurations.RECOMMENDATION_TYPE == POST_RECOMMENDATION_TYPE_LIST[2][0]: # Hybread
-    #     sendPostRecommendationsSocial.delay(instance.id, config_id)
+    if configurations.RECOMMENDATION_TYPE == POST_RECOMMENDATION_TYPE_LIST[2][0]: # Hybread
+        sendPostRecommendationsSocial.delay(instance.id, config_id)
 
     

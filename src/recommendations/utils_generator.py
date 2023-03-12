@@ -2,8 +2,9 @@ import pandas as pd
 from surprise import KNNBasic, KNNWithMeans, KNNWithZScore, KNNBaseline, SVD, NMF
 from surprise import Dataset, Reader
 from groups.models import GroupsMember
-from .models import Ratings, Labels, TrackerGroupRecommendation, TrackerPostRecommendation
+from .models import Ratings, Labels, TrackerGroupRecommendation, TrackerPostRecommendation, TrackerWearableRecommendation, SenderWearableRecommendation
 from .utils_nlp import get_nlp_classification
+import copy
 
 
 def couple_source(couple):
@@ -192,8 +193,101 @@ def generateColleberativeFilteringRecommnedation(user, is_label, is_coupuled, so
     
     return est_ratings
 
-def generateWearableRecommendations(group):
-    recommenation, (label_ratings_track, recommendation_list) =  generateGroupRecommendations(group)
+def generateWearableRecommendations(user):
+    """"
+    This function generates recommedantion using preferences of the users
+    If recommendation cannot be generated for any of the users, the system generates a random recommendation
+
+    Input:
+        user = This needs to be a user Object
+    
+    Output:
+        recommendation = This is a recommendation
+
+        raw_data = 
+            If the system was able to generate a recommendation using the algorithm 
+                (label_ratings, recommendation_list)
+            If the recommdantion was a randomly generated recommendation
+                None
+    """
+
+    # This is calculating for all laels we can recommend
+    label_ratings = generateColleberativeFilteringRecommnedation(user, is_label=True, is_coupuled=False)
+    
+    if label_ratings == None:
+        recommendation_list = Labels.objects.filter(is_label=True, is_coupuled=False).order_by('?')
+        recommendation_index = 0
+
+        if TrackerWearableRecommendation.objects.filter(user=user).count() > 10:
+            previous_10_recommendation_labels = [tpr.recommended for tpr in TrackerWearableRecommendation.objects.filter(user=user).order_by('-id')[:10]]
+        else:
+            previous_10_recommendation_labels = [tpr.recommended for tpr in TrackerWearableRecommendation.objects.filter(user=user)]
+
+        while recommendation_list[recommendation_index] in previous_10_recommendation_labels:
+                # selected recommendation alread present in the last 10 recommendations given to the user
+            recommendation_index += 1
+        
+        if recommendation_index == len(recommendation_list):
+            recommendation_index-=1
+
+
+        return recommendation_list[recommendation_index], None
+    
+
+    #my logic
+    recommendation_list =copy.deepcopy(label_ratings)
+    # change recommendation list as needed
+
+    # this should not have multiple objects at same time, am i right? will I get the right object of multiplicity??
+    multiplicities= SenderWearableRecommendation.objects.filter(user=user).order_by("-id").first()
+
+    # Getting context
+    #context, raw_outputs = get_nlp_classification(instance.title)
+
+    # get rating for coupled labels (i.e food-food, exercise-exercise, food-exercise, ....)
+    #couple_ratings = generateColleberativeFilteringRecommnedation(instance.user, is_label=False, is_coupuled=True)
+
+    # Getting the rating for current context 
+    # rating_for_context_dic = dict()
+    # for couple, rating in couple_ratings:
+    #     if couple_source(couple) == context:
+    #         if rating_for_context_dic.get(couple_target(couple)):
+    #             rating_for_context_dic[couple_target(couple)] = (rating_for_context_dic[couple_target(couple)] + rating) / 2
+    #         else:
+    #             rating_for_context_dic[couple_target(couple)] = rating
+
+    # This is for the question that ask about strengths and weaknesses
+    # strength_ratings = generateColleberativeFilteringRecommnedation(instance.user, is_label=False, is_coupuled=False)
+
+    #recommendation_list = []
+    # Adding 
+    # for label, target_rating in label_ratings:
+    #     if rating_for_context_dic.get(label.type):
+    #         recommendation_list.append([label, target_rating+rating_for_context_dic[label.type]], )
+
+    # recommendation_list.sort(key=lambda x: x[1],reverse=True)
+
+    # # Avoid the 10 previously recommended activities
+    # recommendation_index = 0
+
+    if TrackerWearableRecommendation.objects.filter(user=user).count() > 10:
+        previous_10_recommendation_labels = [tpr.recommended for tpr in TrackerWearableRecommendation.objects.filter(user=user).order_by('-id')[:10]]
+    else:
+        previous_10_recommendation_labels = [tpr.recommended for tpr in TrackerWearableRecommendation.objects.filter(user=user)]
+
+    while recommendation_list[recommendation_index][0] in previous_10_recommendation_labels:
+            # selected recommendation alread present in the last 10 recommendations given to the user
+        recommendation_index += 1
+    
+    if recommendation_index == len(recommendation_list):
+        recommendation_index-=1
+
+    return recommendation_list[recommendation_index][0], ( label_ratings, recommendation_list)
+
+
+
+def generateWearableRecommendations(user):
+    recommenation, (label_ratings_track, recommendation_list) =  generateWearableRecommendations(user)
 
     # recommendation_list
 
