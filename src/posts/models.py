@@ -20,7 +20,7 @@ class Post(models.Model):
     label = models.ForeignKey('recommendations.labels', models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return str(self.user)+"'s post"
+        return str(self.user)+"'s post  ==> "+str(self.group) + " ==> " + str(self.created_on)
 
     def user_image(self):
         return str(self.user.image)

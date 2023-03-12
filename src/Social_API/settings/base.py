@@ -134,6 +134,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 PROJECT_NAME = 'PhamilyHealth'
 
 FIREBASE_PROJECT_KEY= 'AAAARVQhCgA:APA91bGemTw3miRbIQtYgIG1LbgG1Fxc7JkTPlZzP51d9uLnDWIMhQTK186WfkfY1rJHIll-mGnCd-r7gqhhUM_PlW4asnjrJd-QyptD1_vOicjK0LbdlUOQPOsbh6vFmuB62-53YI_k'
+FIREBASE_NOTIFICATION_URL = 'https://fcm.googleapis.com/fcm/send'
 
 MODELS_PATH = Path(BASE_DIR, 'models/best_model-xlnet-base-cased')
 MODEL_NAME = 'xlnet'
@@ -149,7 +150,7 @@ CELERY_BEAT_SCHEDULE = {
     # This will chek for all scheduled tasks. It will run every 120 seconds
     'Scheduled-Recommendations': {
         'task': 'recommendations.tasks.runScheduledTasks',
-        'schedule': 120.0,
+        'schedule': 20.0,
     },
     # This will set scheduled tasks 'date_time' parameter to false, so it can run for the next day
     'Reset-Scheduled': {

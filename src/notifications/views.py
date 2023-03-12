@@ -18,7 +18,7 @@ class NotificationListView(APIView):
     def get(self, request):
         queryset = self.model.objects.filter(
             user=request.user
-        ).order_by('-created_on')
+        ).order_by('-date_time')
         data = {"notifications": NotificationSerializer(queryset, many=True).data}
         return Response(data)
 
