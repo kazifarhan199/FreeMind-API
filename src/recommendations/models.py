@@ -54,7 +54,13 @@ class SenderGroupRecommendation(models.Model):
     
 
 class SenderWearableRecommendation(models.Model):
-    group = models.ForeignKey(Groups, models.CASCADE, null=True, blank=True)
+    reason = models.CharField(max_length=3000)
+    sleep = models.FloatField(null=True)
+    stress = models.FloatField(null=True)
+    food = models.FloatField(null=True)
+    exercise = models.FloatField(null=True)
+    general = models.FloatField(null=True)
+    user = models.ForeignKey(User, models.CASCADE, null=True, blank=True)
     tags = models.CharField(max_length=300)
     date_time = models.DateTimeField(auto_now=True, blank=True)
 
@@ -137,9 +143,9 @@ class TrackerWearableRecommendation(models.Model):
         return str(self.group) + " ==> " + str(self.recommended) + " ==> " + str(self.sender.tags)
 
 from .signals import sendGroupRecommendationsSignal ,sendPostRecommendationsSignal, sendWearableRecommendationsSignal
-signals.post_save.connect(sendGroupRecommendationsSignal, sender=SenderGroupRecommendation)
+#signals.post_save.connect(sendGroupRecommendationsSignal, sender=SenderGroupRecommendation)
 signals.post_save.connect(sendWearableRecommendationsSignal, sender=SenderWearableRecommendation)
-signals.post_save.connect(sendPostRecommendationsSignal, sender=SenderPostRecommendation)
+#signals.post_save.connect(sendPostRecommendationsSignal, sender=SenderPostRecommendation)
 
 
 class ScheduledGroupTaslk(models.Model):
