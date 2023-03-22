@@ -24,7 +24,8 @@ class GroupListView(ListAPIView):
             if gm.user == gm.group.user:
                 gms.append(gm.group.id)
         queryset = Groups.objects.filter(
-                pk__in=gms
+                pk__in=gms,
+                is_hidden=False,
             )
         return queryset.order_by('-id')
 

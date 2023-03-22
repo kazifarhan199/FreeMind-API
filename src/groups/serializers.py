@@ -61,7 +61,7 @@ class GroupsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Groups
-        fields = ('group_name', 'members', 'user', 'id', 'isin', 'image', 'image_path', 'is_channel')
+        fields = ('group_name', 'members', 'user', 'id', 'isin', 'image', 'image_path', 'is_channel', 'is_hidden')
 
     def isIn(self, obj):
         user = self.context.get('request', None).user

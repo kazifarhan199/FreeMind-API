@@ -38,6 +38,7 @@ class PostSerializer(serializers.ModelSerializer):
     liked = serializers.SerializerMethodField('isLiked')
     
     group_name = serializers.SerializerMethodField('get_group_name')
+    group_is_hidden = serializers.SerializerMethodField('get_group_is_hidden')
     group_image = serializers.SerializerMethodField('get_group_image')
     link = serializers.CharField(required=False, allow_blank=True)
 
@@ -63,6 +64,9 @@ class PostSerializer(serializers.ModelSerializer):
     def get_group_image(self, obj):
         return obj.group.image.url
 
+    def get_group_is_hidden(self, obj):
+        return obj.group.is_hidden
+    
     def isLiked(self, obj):
         request = self.context.get('request', None)
         user = request.user
@@ -90,6 +94,7 @@ class PostSerializer(serializers.ModelSerializer):
             'group_image',
             'link',
             'is_recommendation',
+            'group_is_hidden',
         )
 
 
