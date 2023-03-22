@@ -69,7 +69,7 @@ class SenderWearableRecommendation(models.Model):
     date_time = models.DateTimeField(auto_now=True, blank=True)
 
     def __str__(self):
-        return str(self.group) + " ==> " + str(self.tags)
+        return str(self.user.group) + " ==> " + str(self.tags)
     
 class SenderPostRecommendation(models.Model):
     post = models.ForeignKey(Post, models.CASCADE)
@@ -128,9 +128,9 @@ class TrackerGroupRecommendation(models.Model):
 
 
 class TrackerWearableRecommendation(models.Model):
-    group = models.ForeignKey(Groups, models.CASCADE)
+    user = models.ForeignKey(User, models.CASCADE)
     recommended = models.ForeignKey(Labels, models.CASCADE)
-    sender = models.ForeignKey(SenderGroupRecommendation, models.CASCADE)
+    sender = models.ForeignKey(SenderWearableRecommendation, models.CASCADE)
 
     recommendation_tree = models.TextField()
     recommendation_scores = models.TextField()
@@ -144,7 +144,7 @@ class TrackerWearableRecommendation(models.Model):
     configurations = models.ForeignKey(Configuration, models.CASCADE)
 
     def __str__(self):
-        return str(self.group) + " ==> " + str(self.recommended) + " ==> " + str(self.sender.tags)
+        return str(self.sender.user.group) + " ==> " + str(self.recommended) + " ==> " + str(self.sender.tags)
 
 from .signals import sendGroupRecommendationsSignal ,sendPostRecommendationsSignal, sendWearableRecommendationsSignal
 #signals.post_save.connect(sendGroupRecommendationsSignal, sender=SenderGroupRecommendation)

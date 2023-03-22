@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from posts.models import Post, PostComment
 from django.conf import settings
 from celery import shared_task
-from groups.models import GroupsMember
+from groups.models import GroupsMember, Groups
 
 from .models import TrackerPostRecommendation, TrackerGroupRecommendation, SenderPostRecommendation, SenderGroupRecommendation, TrackerWearableRecommendation, SenderWearableRecommendation
 from .utils_generator import generatePostRecommendations, generateGroupRecommendations, generateWearableRecommendations
@@ -202,24 +202,28 @@ def sendWearableRecommendations(instance_id, config_id):
 
     instance = SenderWearableRecommendation.objects.get(pk=instance_id)
     user = instance.user
-    recommendation, raw_data = generateWearableRecommendations(user)
+    recommendation, reason,  raw_data = generateWearableRecommendations(user)
 
     if raw_data != None:
         label_ratings_track, recommendation_list = raw_data
+        print("label_ratings_track")
+        print(label_ratings_track)
+        print("\n\nrecommendation_list ")
+        print(recommendation_list)
     else:
         label_ratings_track, recommendation_list = "None", "None"
 
     post = Post.objects.create(
         user=User.objects.get(pk=configurations.BOT_ID.id),
         group=instance.user.group,
-        title=recommendation.reason, 
+        title="Recommendation: "+ recommendation.source_based +"\n\n\nReason: "+recommendation.type +": "+ reason, 
         link=recommendation.link, 
         need_feadback=True, 
         is_recommendation=True,
     )
 
     TrackerWearableRecommendation.objects.create(
-        group=group,
+        user=instance.user,
         recommended=recommendation,
         recommendation_tree= label_ratings_track, 
         recommendation_scores = [(c.type, c.name, c.id, r) for c, r in recommendation_list] if raw_data!=None else recommendation_list, 

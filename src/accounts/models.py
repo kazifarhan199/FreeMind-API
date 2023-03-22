@@ -44,6 +44,7 @@ class OTP(models.Model):
         
 
 # User model
+from groups.models import Groups
 
 User._meta.get_field('email')._error_messages = {'unique':"This email has already been registered."}
 User._meta.get_field('email')._unique = True
@@ -56,8 +57,13 @@ def token(self):
 def image(self):
     return str(self.profile.image.url)
 
+@property
+def group(self):
+    return Groups.objects.filter(user=self).order_by('id').first()
+
 User.add_to_class('token', token)
 User.add_to_class('image', image)
+User.add_to_class('group', group)
 
 
 # Signals
