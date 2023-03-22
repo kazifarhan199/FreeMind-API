@@ -5,7 +5,7 @@ from . import utils
 
 
 def collect_garmin_daily_data_view(request):
-    data = json.loads(request.body)
+    data = json.loads(request.body.decode("utf-8"))
     utils.save_garmin_daily_data_to_db(data)
     utils.dataToDailies(data)
     return HttpResponse("<h1>Ok<h1>")
