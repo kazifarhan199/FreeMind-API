@@ -1,5 +1,9 @@
 from . import models
-from datetime import date
+
+import datetime
+from dateutil import tz
+
+
 from recommendations.models import SenderWearableRecommendation
 
 from django.contrib.auth import get_user_model
@@ -49,6 +53,9 @@ def save_garmin_sleep_data_to_db(data):
     #     # handle the exception
     #     print(f'Error saving data: {e}')    
 
+def dateToday():
+     pass
+
 
 # saving daily data from garmin (just the columns needed instead of all the data)
 def dataToDailies(data):
@@ -56,17 +63,23 @@ def dataToDailies(data):
     # try:
         # Create or retrieve the instance from the db
         #  data = {'dailies': [ {'userId': ... } { } { } ]} 
-        today=date.today()
+        today=datetime.datetime.today()-datetime.timedelta(hours=6)
+        today=today.date()
+        print(today)
         dailiesList=data['dailies']
         #print(dailiesList==None)
         #print(dailiesList)
+        filter=models.DailyData.objects.filter(is_active=True,garminUserId = dailiesList[0].get('userId'),userAccessToken=dailiesList[0].get('userAccessToken'))
+        for i in filter:
+            i.is_active=False
+            i.save()
         for day in dailiesList:
-            filter= models.DailyData.objects.filter(is_active=True, garminUserId = day.get('userId'),userAccessToken=day.get('userAccessToken'),calendarDate=day.get('calendarDate'))
-            if(filter.exists()):
+            # filter= models.DailyData.objects.filter(is_active=True, garminUserId = day.get('userId'),userAccessToken=day.get('userAccessToken'),calendarDate=day.get('calendarDate'))
+            # if(filter.exists()):
 
-                for i in filter:
-                    i.is_active=False
-                    i.save()
+            #     for i in filter:
+            #         i.is_active=False
+            #         i.save()
             #create a instance in the DB
             #print(str(today))
             #print(str(day.get('calendarDate')))
@@ -105,15 +118,24 @@ def dataToDailies(data):
         #this block will filter the latest data of the user in question and makes a call to the analysis function
 
         # Alternative
-        filter=models.DailyData.objects.filter(is_active=True,garminUserId = dailiesList[0].get('userId'),userAccessToken=dailiesList[0].get('userAccessToken')).order_by('-calendarDate').first()
-        
+        filter=models.DailyData.objects.filter(is_active=True,garminUserId = dailiesList[0].get('userId'),userAccessToken=dailiesList[0].get('userAccessToken'))
+        for day in filter:
+            print(day.garminUserId, day.calendarDate)
+            if (str(today)==str(day.calendarDate)):
+                print("OBJECT")
+                print(day.garminUserId, day.calendarDate)
+                print("OBJECT DONE")
+                analysis= dataAnalysis(day, _type='daily')
+                print(analysis)
+                break
+            #print(day.calendarDate)
         #filter= models.DailyData.objects.filter(is_active=True, userId = day.get('userId'),userAccessToken=day.get('userAccessToken'),calendarDate=day.get('calendarDate'))
-        if(filter):
-            #for curr_obj in filter:
-            print("OBJECT")
-            print(filter.garminUserId, filter.calendarDate)
-            print("OBJECT DONE")
-            dataAnalysis(filter, _type='daily')
+        # if(filter):
+        #     #for curr_obj in filter:
+        #     print("OBJECT")
+        #     print(filter.garminUserId, filter.calendarDate)
+        #     print("OBJECT DONE")
+        #     dataAnalysis(filter, _type='daily')
             
             
     # except Exception as e:
@@ -125,7 +147,7 @@ def dataToSleep(data):
     
     # try:
         sleepList=data['sleeps']
-        today=date.today()
+        today=datetime.date.today()
         for sleep in sleepList:
             filter= models.SleepData.objects.filter(is_active=True, garminUserId = sleep.get('userId'),userAccessToken=sleep.get('userAccessToken'),calendarDate=sleep.get('calendarDate'))
             if(filter.exists()):
@@ -170,14 +192,14 @@ def dataAnalysisDaily(curr_obj_data):
     if((curr_obj_data.steps==None or curr_obj_data.steps==0) and (curr_obj_data.activeKilocalories==0 or curr_obj_data.activeKilocalories==None)):
         reason = reason + "it appears that your calorie intake and step count have not been measured. To gain a more comprehensive understanding of your activity and nutrition, it is recommended that you track these metrics consistently. "
     else:
-        if(curr_obj_data.activeKilocalories >= 300 or (curr_obj_data.steps>= 2000 and curr_obj_data.steps<=5000)):
-            dict_ActivityMultiplicity['exercise']=0.9
-            dict_ActivityMultiplicity['food']=1.1
-            #print(curr_obj_data.activeKilocalories, curr_obj_data.steps)
-            reason = reason + "it appears that you have engaged in a sufficient amount of exercise for the day. It is recommended that you now focus on consuming a well-balanced and nutritious diet to support your physical activity and overall health. "
-        elif(curr_obj_data.activeKilocalories >= 500 or curr_obj_data.steps> 5000 ):
+        if((curr_obj_data.activeKilocalories >= 300 and curr_obj_data.activeKilocalories <= 500) or (curr_obj_data.steps>= 5000 and curr_obj_data.steps<=10000)):
             dict_ActivityMultiplicity['exercise']=0.7
             dict_ActivityMultiplicity['food']=1.3
+            #print(curr_obj_data.activeKilocalories, curr_obj_data.steps)
+            reason = reason + "it appears that you have engaged in a sufficient amount of exercise for the day. It is recommended that you now focus on consuming a well-balanced and nutritious diet to support your physical activity and overall health. "
+        elif(curr_obj_data.activeKilocalories > 500 or curr_obj_data.steps> 10000 ):
+            dict_ActivityMultiplicity['exercise']=0.5
+            dict_ActivityMultiplicity['food']=1.5
             #print(curr_obj_data.activeKilocalories, curr_obj_data.steps)
             reason = reason + "it appears that you have engaged in high levels of exercise. To fully reap the benefits of your exercise, it is recommended that you consume a well-balanced and nutritious diet. Adequate nutrition can help support your physical activity and overall health. "
         else:
@@ -187,12 +209,12 @@ def dataAnalysisDaily(curr_obj_data):
             reason = reason + "it appears that you have not engaged in a substantial amount of physical activity today. It is recommended that you consider incorporating more physical activity into your daily routine for optimal health and well-being. "
 
     # STRESS Analysis 
-    dictStressQualifiers = {'stressfull':1.5, 'unknown':1, 'balanced': 1.3, 'calm':1} 
-    if(curr_obj_data.stressQualifier == "unknown"):
+    dictStressQualifiers = {'stressful':1.5, 'unknown':1, 'balanced': 1.3, 'calm':1}
+    if(curr_obj_data.stressQualifier == "unknown" or not curr_obj_data.stressQualifier):
         reason = reason + "Also, your stress levels have not been measured. Tracking your stress levels can provide valuable insights into your overall well-being and can help inform potential lifestyle adjustments. It is recommended that you consider incorporating stress tracking into your routine. "
     else:
         reason = reason + "Your stress level is analysed as " + curr_obj_data.stressQualifier + ". "
-    dict_ActivityMultiplicity['stress']=dictStressQualifiers[curr_obj_data.stressQualifier]
+        dict_ActivityMultiplicity['stress']=dictStressQualifiers.get(curr_obj_data.stressQualifier)
 
     return dict_ActivityMultiplicity, reason
 
@@ -209,7 +231,7 @@ def dataAnalysisSleep(curr_obj_data):
                 sleep= 1.5
             else:
                 reason = reason + "You had enough sleep. "
-                sleep=1
+                sleep=1.2
         else:
             reason = reason + "Also you should take rest as you had less than 7 hours of sleep. "
             sleep=2
@@ -229,21 +251,26 @@ def dataAnalysis(curr_obj_data, _type):
         dict, reason = dataAnalysisDaily(curr_obj_data)
         sleep, sleepreason = dataAnalysisSleep(curr_obj_data)
         reason = reason + sleepreason
+        if(sleep==2 and dict['stress']):
+            dict['stress']=dict['stress']+0.2
+        elif(sleep==2 ):
+            dict['stress']=1.2
         dict['sleep']=sleep
         print(reason, dict.keys(), dict.values())
-'''
-        models.SleepData.objects.create( 
-            reason = models.CharField(max_length=3000)
-            sleep = dict['sleep']
-            stress = dict['stress']
-            food = dict['food']
-            exercise = dict['exercise']
-            general = dict['general']
-            user= models.UserIdMap.get(garminUserId=curr_obj_data.garminUserId).user
-        )
-        instance.save()
 
-'''        
+        SenderWearableRecommendation.objects.create( 
+            reason = reason,
+            sleep = dict['sleep'],
+            stress = dict['stress'],
+            food = dict['food'],
+            exercise = dict['exercise'],
+            general = dict['general'],
+            user= models.UserIdMap.objects.get(garminUserId=curr_obj_data.garminUserId).user,
+        )
+
+        return True
+
+       
     #communicate to recommendation system
     
     # create 1-5/0.1-1.9 scale for each activity and then increase or decrease the multiplicty of the type accordingly
