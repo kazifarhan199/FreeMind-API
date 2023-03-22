@@ -20,7 +20,8 @@ def sendGroupRecommendationsSignal(sender, instance, *args, **kwargs):
 
 
 def sendWearableRecommendationsSignal(sender, instance, *args, **kwargs):
-    configurations = Configuration.objects.filter(group=instance.group).order_by('-id').first()
+    # configurations = Configuration.objects.filter(group=instance.group).order_by('-id').first()
+    configurations = None
     if configurations == None:
         print("\n\n\n\t\t!!!!!Clease create configurations in admin!!!!!\n\n\n.")
         configurations = Configuration.objects.all().order_by('-id').first()
@@ -29,6 +30,7 @@ def sendWearableRecommendationsSignal(sender, instance, *args, **kwargs):
 
     if instance.user:
         # sendWearableRecommendations.delay(instance.id, config_id)
+        
         sendWearableRecommendations(instance.id, config_id)
         return 
     else:
