@@ -217,7 +217,7 @@ def generateWearableRecommendations(user):
 
     # This is calculating for all laels we can recommend
     label_ratings = generateColleberativeFilteringRecommnedation(user, is_label=True, is_coupuled=False)
-    
+    recommendation_index = 0
     if label_ratings == None:
         recommendation_list = Labels.objects.filter(is_label=True, is_coupuled=False).order_by('?')
         recommendation_index = 0
@@ -235,16 +235,33 @@ def generateWearableRecommendations(user):
             recommendation_index-=1
 
 
-        return recommendation_list[recommendation_index], None
+        return recommendation_list[recommendation_index], 'None', None
     
 
     #my logic
     recommendation_list =copy.deepcopy(label_ratings)
+
+    multiplicities= SenderWearableRecommendation.objects.filter(user=user).order_by("-id").first()
+
+    for label, rating in recommendation_list:
+        if(label.type == 'exercise' ):
+            rating= rating * multiplicities.exercise
+        elif(label.type == 'general'):
+            rating= rating * multiplicities.general
+        elif(label.type == 'food'):
+            rating= rating * multiplicities.food
+        elif(label.type == 'stress' and label.name != 'sleep'):
+            rating= rating * multiplicities.stress
+        elif(label.name == 'sleep'):
+            rating= rating * multiplicities.sleep
+
+
     # change recommendation list as needed
 
     # this should not have multiple objects at same time, am i right? will I get the right object of multiplicity??
-    multiplicities= SenderWearableRecommendation.objects.filter(user=user).order_by("-id").first()
+    
 
+    
     # Getting context
     #context, raw_outputs = get_nlp_classification(instance.title)
 
@@ -286,13 +303,4 @@ def generateWearableRecommendations(user):
     if recommendation_index == len(recommendation_list):
         recommendation_index-=1
 
-    return recommendation_list[recommendation_index][0], ( label_ratings, recommendation_list)
-
-
-
-def generateWearableRecommendations(user):
-    recommenation, (label_ratings_track, recommendation_list) =  generateWearableRecommendations(user)
-
-    # recommendation_list
-
-    return recommenation, (label_ratings_track, recommendation_list)
+    return recommendation_list[recommendation_index][0], multiplicities.reason, ( label_ratings, recommendation_list)
