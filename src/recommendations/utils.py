@@ -5,7 +5,7 @@ from celery import shared_task
 from groups.models import GroupsMember, Groups
 
 from .models import TrackerPostRecommendation, TrackerGroupRecommendation, SenderPostRecommendation, SenderGroupRecommendation, TrackerWearableRecommendation, SenderWearableRecommendation
-from .utils_generator import generatePostRecommendations, generateGroupRecommendations, generateWearableRecommendations
+from .utils_generator import generatePostRecommendations, generateGroupRecommendations, generateWearableRecommendations, sort_key_take_rating
 from configuration.models import Configuration, POST_RECOMMENDATION_TYPE_LIST
 
 User = get_user_model()
@@ -204,12 +204,24 @@ def sendWearableRecommendations(instance_id, config_id):
     user = instance.user
     recommendation, reason,  raw_data = generateWearableRecommendations(user)
 
+
+
     if raw_data != None:
         label_ratings_track, recommendation_list = raw_data
-        print("label_ratings_track")
-        print(label_ratings_track)
+        #print("label_ratings_track")
+        #print(label_ratings_track)
         print("\n\nrecommendation_list ")
         print(recommendation_list)
+        sorted_recommendation_list =sorted(recommendation_list,key=sort_key_take_rating)
+        print("\n\n sorted recommendation_list ")
+        print( sorted_recommendation_list)
+        print("\n\n!!!!!!!!!!!!!!")
+        print( sorted_recommendation_list[-1])
+        print("sorted label_ratings_track")
+        sorted_label_track =sorted(label_ratings_track,key=sort_key_take_rating)
+        print(sorted_label_track)
+        print("\n\n!!!!!!!!!!!!!!")
+        print(sorted_label_track[-1])
     else:
         label_ratings_track, recommendation_list = "None", "None"
 

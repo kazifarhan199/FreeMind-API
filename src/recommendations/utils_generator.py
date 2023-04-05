@@ -197,6 +197,10 @@ def generateColleberativeFilteringRecommnedation(user, is_label, is_coupuled, so
     
     return est_ratings
 
+
+def sort_key_take_rating(ele):
+    return ele[1]
+
 def generateWearableRecommendations(user):
     """"
     This function generates recommedantion using preferences of the users
@@ -243,17 +247,26 @@ def generateWearableRecommendations(user):
 
     multiplicities= SenderWearableRecommendation.objects.filter(user=user).order_by("-id").first()
 
+    itr=0
     for label, rating in recommendation_list:
-        if(label.type == 'exercise' ):
+        if(label.type == 'Exercise' ):
             rating= rating * multiplicities.exercise
-        elif(label.type == 'general'):
+            recommendation_list[itr][1]=round(rating, 2)
+        elif(label.type == 'General'):
             rating= rating * multiplicities.general
-        elif(label.type == 'food'):
+            recommendation_list[itr][1]=round(rating, 2)
+        elif(label.type == 'Food'):
             rating= rating * multiplicities.food
-        elif(label.type == 'stress' and label.name != 'sleep'):
+            recommendation_list[itr][1]=round(rating, 2)
+        elif(label.type == 'Stress' and label.name != 'Sleep'):
             rating= rating * multiplicities.stress
-        elif(label.name == 'sleep'):
+            recommendation_list[itr][1]=round(rating, 2)
+        elif(label.name == 'Sleep'):
             rating= rating * multiplicities.sleep
+            recommendation_list[itr][1]=round(rating, 2)
+        else:
+            print(label.type)
+        itr= itr+1
 
 
     # change recommendation list as needed
@@ -290,7 +303,7 @@ def generateWearableRecommendations(user):
 
     # # Avoid the 10 previously recommended activities
     # recommendation_index = 0
-
+    recommendation_list=sorted(recommendation_list,key=sort_key_take_rating, reverse=True)
     if TrackerWearableRecommendation.objects.filter(user=user).count() > 10:
         previous_10_recommendation_labels = [tpr.recommended for tpr in TrackerWearableRecommendation.objects.filter(user=user).order_by('-id')[:10]]
     else:
@@ -302,5 +315,6 @@ def generateWearableRecommendations(user):
     
     if recommendation_index == len(recommendation_list):
         recommendation_index-=1
-
+    print("score of recommended activity:")
+    print(recommendation_list[recommendation_index][1])
     return recommendation_list[recommendation_index][0], multiplicities.reason, ( label_ratings, recommendation_list)
