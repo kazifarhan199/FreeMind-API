@@ -198,36 +198,36 @@ def dataAnalysisDaily(curr_obj_data):
         if((curr_obj_data.activeKilocalories >= 300 and curr_obj_data.activeKilocalories <= 500) or (curr_obj_data.steps>= 5000 and curr_obj_data.steps<=10000)):
             #dict_ActivityMultiplicity['exercise']=1 
             #dict_ActivityMultiplicity['food']=1.3
-            #dict_ActivityMultiplicity['exercise']=1 
-            #dict_ActivityMultiplicity['food']=1.1
             dict_ActivityMultiplicity['exercise']=1 
-            dict_ActivityMultiplicity['food']=1.05
+            dict_ActivityMultiplicity['food']=1.1
+            #dict_ActivityMultiplicity['exercise']=1 
+            #dict_ActivityMultiplicity['food']=1.05
             #print(curr_obj_data.activeKilocalories, curr_obj_data.steps)
             reason = reason + "it appears that you have engaged in a sufficient amount of exercise for the day. It is recommended that you now focus on consuming a well-balanced and nutritious diet to support your physical activity and overall health. "
         elif(curr_obj_data.activeKilocalories > 500 or curr_obj_data.steps> 10000 ):
             #dict_ActivityMultiplicity['exercise']=0.7
             #dict_ActivityMultiplicity['food']=1.5
-            #dict_ActivityMultiplicity['exercise']=0.8
-            #dict_ActivityMultiplicity['food']=1.3
-            dict_ActivityMultiplicity['exercise']=0.9
-            dict_ActivityMultiplicity['food']=1.1
+            dict_ActivityMultiplicity['exercise']=0.8
+            dict_ActivityMultiplicity['food']=1.3
+            #dict_ActivityMultiplicity['exercise']=0.9
+            #dict_ActivityMultiplicity['food']=1.1
             #print(curr_obj_data.activeKilocalories, curr_obj_data.steps)
             reason = reason + "it appears that you have engaged in high levels of exercise. To fully reap the benefits of your exercise, it is recommended that you consume a well-balanced and nutritious diet. Adequate nutrition can help support your physical activity and overall health. "
         else:
             #dict_ActivityMultiplicity['exercise']=1.5
             #dict_ActivityMultiplicity['food']=0.9
-            #dict_ActivityMultiplicity['exercise']=1.3
-            #dict_ActivityMultiplicity['food']=1
-            dict_ActivityMultiplicity['exercise']=1.1
+            dict_ActivityMultiplicity['exercise']=1.3
             dict_ActivityMultiplicity['food']=1
+            #dict_ActivityMultiplicity['exercise']=1.1
+            #dict_ActivityMultiplicity['food']=1
             print(curr_obj_data.activeKilocalories, curr_obj_data.steps)
             reason = reason + "it appears that you have not engaged in a substantial amount of physical activity today. It is recommended that you consider incorporating more physical activity into your daily routine for optimal health and well-being. "
 
     # STRESS Analysis 
     #dictStressQualifiers = {'stressful':1.5, 'unknown':1, 'balanced': 1.3, 'calm':0.9} -- don't use this
     #dictStressQualifiers = {'stressful':1.5, 'unknown':1.3, 'balanced': 1, 'calm':0.7}
-    #dictStressQualifiers = {'stressful':1.3, 'unknown':1.1, 'balanced': 1, 'calm':0.8}
-    dictStressQualifiers = {'stressful':1.1, 'unknown':1.05, 'balanced': 1, 'calm':0.9}
+    dictStressQualifiers = {'stressful':1.3, 'unknown':1.1, 'balanced': 1, 'calm':0.8}
+    #dictStressQualifiers = {'stressful':1.1, 'unknown':1.05, 'balanced': 1, 'calm':0.9}
     if(not curr_obj_data.stressQualifier or curr_obj_data.stressQualifier == "unknown"):
         dict_ActivityMultiplicity['stress']=dictStressQualifiers.get(curr_obj_data.stressQualifier)
         reason = reason + "Also, your stress levels have not been measured. Tracking your stress levels can provide valuable insights into your overall well-being and can help inform potential lifestyle adjustments. It is recommended that you consider incorporating stress tracking into your routine. "
@@ -260,8 +260,8 @@ def dataAnalysisSleep(curr_obj_data):
         else:
             reason = reason + "Also you should take rest as you had less than 7 hours of sleep. "
             #sleep=2
-            #sleep=1.5
-            sleep=1.3
+            sleep=1.5
+            #sleep=1.3
     else:
         reason = reason + "Sleep is not measured. "
         sleep=1
@@ -279,15 +279,15 @@ def dataAnalysis(curr_obj_data, _type):
         sleep, sleepreason = dataAnalysisSleep(curr_obj_data)
         reason = reason + sleepreason
         #if(sleep==2 and dict['stress']):
-        #if(sleep==1.5 and dict['stress']):
-        if(sleep==1.3 and dict['stress']!='unknown'):
-            #round 1&2#dict['stress']=dict['stress']+0.2
-            dict['stress']=dict['stress']+0.05
+        if(sleep==1.5 and dict['stress']!='unknown'):
+        #if(sleep==1.3 and dict['stress']):
+            dict['stress']=dict['stress']+0.2 #round 1&2
+            #dict['stress']=dict['stress']+0.05
         #elif(sleep==2 ):
-        #elif(sleep==1.5 ):
-        elif(sleep==1.3 and dict['stress']=='unknown'):
-            #round 1&2#dict['stress']=1.2
-            dict['stress']=1.05
+        elif(sleep==1.5 and dict['stress']=='unknown'):
+        #elif(sleep==1.3 ):
+            dict['stress']=1.2 #round 1&2
+            #dict['stress']=1.05
         dict['sleep']=sleep
 
         dict['sleep']=round(dict['sleep'], 2)
