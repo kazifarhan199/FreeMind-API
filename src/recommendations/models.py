@@ -63,7 +63,7 @@ class SenderWearableRecommendation(models.Model):
     stress = models.FloatField(null=True)
     food = models.FloatField(null=True)
     exercise = models.FloatField(null=True)
-    general = models.FloatField(null=True)
+    optimal= models.BooleanField(default=False)
     user = models.ForeignKey(User, models.CASCADE, null=True, blank=True)
     tags = models.CharField(max_length=300)
     date_time = models.DateTimeField(auto_now=True, blank=True)

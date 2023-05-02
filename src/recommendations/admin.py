@@ -18,13 +18,14 @@ admin.site.register(TrackerPostRecommendation)
 admin.site.register(TrackerGroupRecommendation)
 
 # Sender models
-from .models import SenderGroupRecommendation, SenderPostRecommendation
+from .models import SenderGroupRecommendation, SenderPostRecommendation, SenderWearableRecommendation
 
 class ReadOnlyDateAdmin(admin.ModelAdmin):
     readonly_fields = ('date_time',)
 
 admin.site.register(SenderGroupRecommendation, ReadOnlyDateAdmin)
 admin.site.register(SenderPostRecommendation, ReadOnlyDateAdmin)
+admin.site.register(SenderWearableRecommendation)
 
 from .models import ScheduledGroupTaslk
 

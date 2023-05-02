@@ -183,11 +183,10 @@ def dataToSleep(data):
     #1.1-1.9: maybe 1.3: if activity level is low you want to suggest the user to do more of the activity
 def dataAnalysisDaily(curr_obj_data): 
     reason = "Based on your available activity data, "
-    dict_ActivityMultiplicity ={ 'exercise':None, 'food':None, 'stress':None, 'general':1, 'sleep':None}
+    dict_ActivityMultiplicity ={ 'exercise':None, 'food':None, 'stress':None, 'optimal_count':0, 'sleep':None}
 
     # logic to do the Analysis
 
-    
     #STEPS and CALORIES Analysis
     if((curr_obj_data.steps==None or curr_obj_data.steps==0) and (curr_obj_data.activeKilocalories==0 or curr_obj_data.activeKilocalories==None)):
         reason = reason + "it appears that your calorie intake and step count have not been measured. To gain a more comprehensive understanding of your activity and nutrition, it is recommended that you track these metrics consistently. "
@@ -196,6 +195,8 @@ def dataAnalysisDaily(curr_obj_data):
              curr_obj_data.activeKilocalories = curr_obj_data.activeKilocalories*0.75
         
         if((curr_obj_data.activeKilocalories >= 300 and curr_obj_data.activeKilocalories <= 500) or (curr_obj_data.steps>= 5000 and curr_obj_data.steps<=10000)):
+            dict_ActivityMultiplicity['optimal_count']+=1
+
             #dict_ActivityMultiplicity['exercise']=1 
             #dict_ActivityMultiplicity['food']=1.3
             dict_ActivityMultiplicity['exercise']=1 
@@ -205,6 +206,8 @@ def dataAnalysisDaily(curr_obj_data):
             #print(curr_obj_data.activeKilocalories, curr_obj_data.steps)
             reason = reason + "it appears that you have engaged in a sufficient amount of exercise for the day. It is recommended that you now focus on consuming a well-balanced and nutritious diet to support your physical activity and overall health. "
         elif(curr_obj_data.activeKilocalories > 500 or curr_obj_data.steps> 10000 ):
+            dict_ActivityMultiplicity['optimal_count']+=1
+
             #dict_ActivityMultiplicity['exercise']=0.7
             #dict_ActivityMultiplicity['food']=1.5
             dict_ActivityMultiplicity['exercise']=0.8
@@ -228,6 +231,11 @@ def dataAnalysisDaily(curr_obj_data):
     #dictStressQualifiers = {'stressful':1.5, 'unknown':1.3, 'balanced': 1, 'calm':0.7}
     dictStressQualifiers = {'stressful':1.3, 'unknown':1.1, 'balanced': 1, 'calm':0.8}
     #dictStressQualifiers = {'stressful':1.1, 'unknown':1.05, 'balanced': 1, 'calm':0.9}
+    
+    if(curr_obj_data.stressQualifier == "balanced" or curr_obj_data.stressQualifier == "calm"):
+        dict_ActivityMultiplicity['optimal_count']+=1
+    
+    
     if(not curr_obj_data.stressQualifier or curr_obj_data.stressQualifier == "unknown"):
         dict_ActivityMultiplicity['stress']=dictStressQualifiers.get(curr_obj_data.stressQualifier)
         reason = reason + "Also, your stress levels have not been measured. Tracking your stress levels can provide valuable insights into your overall well-being and can help inform potential lifestyle adjustments. It is recommended that you consider incorporating stress tracking into your routine. "
@@ -278,6 +286,10 @@ def dataAnalysis(curr_obj_data, _type):
         dict, reason = dataAnalysisDaily(curr_obj_data)
         sleep, sleepreason = dataAnalysisSleep(curr_obj_data)
         reason = reason + sleepreason
+        
+        if(sleep==1):
+            dict['optimal_count']+=1
+        
         #if(sleep==2 and dict['stress']):
         if(sleep==1.5 and dict['stress']!='unknown'):
         #if(sleep==1.3 and dict['stress']):
@@ -303,7 +315,7 @@ def dataAnalysis(curr_obj_data, _type):
             stress = dict['stress'],
             food = dict['food'],
             exercise = dict['exercise'],
-            general = dict['general'],
+            optimal = True if(dict['optimal_count']==3) else False,
             user= models.UserIdMap.objects.get(garminUserId=curr_obj_data.garminUserId).user,
         )
 

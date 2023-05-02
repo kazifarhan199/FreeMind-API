@@ -225,10 +225,15 @@ def sendWearableRecommendations(instance_id, config_id):
     else:
         label_ratings_track, recommendation_list = "None", "None"
 
+    if (instance.optimal):
+        final_reason= "You did a great job! "+"\n\nRecommendation: "+ recommendation.source_based +"\n\n\nReason: "+recommendation.type +": "+ reason
+    else:
+        final_reason= "Recommendation: "+ recommendation.source_based +"\n\n\nReason: "+recommendation.type +": "+ reason
+
     post = Post.objects.create(
         user=User.objects.get(pk=configurations.BOT_ID.id),
         group=instance.user.group,
-        title="Recommendation: "+ recommendation.source_based +"\n\n\nReason: "+recommendation.type +": "+ reason, 
+        title=final_reason, 
         link=recommendation.link, 
         need_feadback=True, 
         is_recommendation=True,

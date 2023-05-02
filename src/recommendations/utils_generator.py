@@ -242,7 +242,7 @@ def generateWearableRecommendations(user):
         return recommendation_list[recommendation_index], 'None', None
     
 
-    #my logic
+    # logic to alter recommendation preference
     recommendation_list =copy.deepcopy(label_ratings)
 
     multiplicities= SenderWearableRecommendation.objects.filter(user=user).order_by("-id").first()
@@ -251,9 +251,6 @@ def generateWearableRecommendations(user):
     for label, rating in recommendation_list:
         if(label.type == 'Exercise' ):
             rating= rating * multiplicities.exercise
-            recommendation_list[itr][1]=round(rating, 2)
-        elif(label.type == 'General'):
-            rating= rating * multiplicities.general
             recommendation_list[itr][1]=round(rating, 2)
         elif(label.type == 'Food'):
             rating= rating * multiplicities.food
@@ -267,6 +264,7 @@ def generateWearableRecommendations(user):
         else:
             print(label.type)
         itr= itr+1
+
 
 
     # change recommendation list as needed
