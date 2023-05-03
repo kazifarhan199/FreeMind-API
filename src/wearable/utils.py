@@ -182,14 +182,14 @@ def dataToSleep(data):
     #0.1-0.9: maybe 0.7: if activity level is already high you don't want to suggest the user to do more of the activity
     #1.1-1.9: maybe 1.3: if activity level is low you want to suggest the user to do more of the activity
 def dataAnalysisDaily(curr_obj_data): 
-    reason = "Based on your available activity data, "
+    reason = "\nAnalysis of the Day: \n"
     dict_ActivityMultiplicity ={ 'exercise':None, 'food':None, 'stress':None, 'optimal_count':0, 'sleep':None}
 
     # logic to do the Analysis
 
     #STEPS and CALORIES Analysis
     if((curr_obj_data.steps==None or curr_obj_data.steps==0) and (curr_obj_data.activeKilocalories==0 or curr_obj_data.activeKilocalories==None)):
-        reason = reason + "it appears that your calorie intake and step count have not been measured. To gain a more comprehensive understanding of your activity and nutrition, it is recommended that you track these metrics consistently. "
+        reason = reason + "\n"+f"{'Exercise':<10}"+":\t Not measured"
     else:
         if (curr_obj_data.activeKilocalories > 500):
              curr_obj_data.activeKilocalories = curr_obj_data.activeKilocalories*0.75
@@ -204,7 +204,7 @@ def dataAnalysisDaily(curr_obj_data):
             #dict_ActivityMultiplicity['exercise']=1 
             #dict_ActivityMultiplicity['food']=1.05
             #print(curr_obj_data.activeKilocalories, curr_obj_data.steps)
-            reason = reason + "it appears that you have engaged in a sufficient amount of exercise for the day. It is recommended that you now focus on consuming a well-balanced and nutritious diet to support your physical activity and overall health. "
+            reason = reason + "\n"+f"{'Exercise':<10}"+":\t \U0001F7E2"
         elif(curr_obj_data.activeKilocalories > 500 or curr_obj_data.steps> 10000 ):
             dict_ActivityMultiplicity['optimal_count']+=1
 
@@ -215,7 +215,7 @@ def dataAnalysisDaily(curr_obj_data):
             #dict_ActivityMultiplicity['exercise']=0.9
             #dict_ActivityMultiplicity['food']=1.1
             #print(curr_obj_data.activeKilocalories, curr_obj_data.steps)
-            reason = reason + "it appears that you have engaged in high levels of exercise. To fully reap the benefits of your exercise, it is recommended that you consume a well-balanced and nutritious diet. Adequate nutrition can help support your physical activity and overall health. "
+            reason = reason + "\n"+f"{'Exercise':<10}"+":\t \U0001F7E2"
         else:
             #dict_ActivityMultiplicity['exercise']=1.5
             #dict_ActivityMultiplicity['food']=0.9
@@ -224,12 +224,13 @@ def dataAnalysisDaily(curr_obj_data):
             #dict_ActivityMultiplicity['exercise']=1.1
             #dict_ActivityMultiplicity['food']=1
             print(curr_obj_data.activeKilocalories, curr_obj_data.steps)
-            reason = reason + "it appears that you have not engaged in a substantial amount of physical activity today. It is recommended that you consider incorporating more physical activity into your daily routine for optimal health and well-being. "
+            reason = reason + "\n"+f"{'Exercise':<10}"+":\t \U0001F534"
 
     # STRESS Analysis 
     #dictStressQualifiers = {'stressful':1.5, 'unknown':1, 'balanced': 1.3, 'calm':0.9} -- don't use this
     #dictStressQualifiers = {'stressful':1.5, 'unknown':1.3, 'balanced': 1, 'calm':0.7}
     dictStressQualifiers = {'stressful':1.3, 'unknown':1.1, 'balanced': 1, 'calm':0.8}
+    dictStressEmojis = {'stressful': "\U0001F92F", 'unknown':"\U0001F937", 'balanced': "\U0001F7E2", 'calm':"\U0001F7E2"}
     #dictStressQualifiers = {'stressful':1.1, 'unknown':1.05, 'balanced': 1, 'calm':0.9}
     
     if(curr_obj_data.stressQualifier == "balanced" or curr_obj_data.stressQualifier == "calm"):
@@ -238,9 +239,9 @@ def dataAnalysisDaily(curr_obj_data):
     
     if(not curr_obj_data.stressQualifier or curr_obj_data.stressQualifier == "unknown"):
         dict_ActivityMultiplicity['stress']=dictStressQualifiers.get(curr_obj_data.stressQualifier)
-        reason = reason + "Also, your stress levels have not been measured. Tracking your stress levels can provide valuable insights into your overall well-being and can help inform potential lifestyle adjustments. It is recommended that you consider incorporating stress tracking into your routine. "
+        reason = reason + "\n"+f"{'Stress':<12}"+":\t Not measured/ Not enough Data"
     else:
-        reason = reason + "Your stress level is analysed as " + curr_obj_data.stressQualifier + ". "
+        reason = reason + "\n"+f"{'Stress':<12}"+":\t " + dictStressEmojis.get(curr_obj_data.stressQualifier) + " Analysis: "+ curr_obj_data.stressQualifier
         dict_ActivityMultiplicity['stress']=dictStressQualifiers.get(curr_obj_data.stressQualifier)
 
     return dict_ActivityMultiplicity, reason
@@ -254,24 +255,24 @@ def dataAnalysisSleep(curr_obj_data):
     if(filter.exists()):
         if(filter.first().durationInSeconds >= 25200):
             if(filter.first().overallSleepScorequalifierKey != "unknown"):
-                reason = reason + "You had enough sleep and the quality of sleep is " +  filter.first().overallSleepScorequalifierKey + ". "
+                reason = reason + "\n"+f"{'Sleep':<12}"+":\t \U0001F7E2 Analysis: " +  filter.first().overallSleepScorequalifierKey + ". "
                 #sleep= 1.5 
                 #sleep= 1.3
                 #sleep= 1.1
                 sleep=1
             else:
-                reason = reason + "You had enough sleep. "
+                reason = reason + "\n"+f"{'Sleep':<12}"+":\t \U0001F7E2"
                 #sleep=1.5
                 #sleep=1.3
                 #sleep=1.1
                 sleep=1
         else:
-            reason = reason + "Also you should take rest as you had less than 7 hours of sleep. "
+            reason = reason + "\n"+f"{'Sleep':<12}"+":\t \U0001F534"
             #sleep=2
             sleep=1.5
             #sleep=1.3
     else:
-        reason = reason + "Sleep is not measured. "
+        reason = reason + "\n"+f"{'Sleep':<12}"+":\t Not Measured "
         sleep=1
     
     return sleep, reason
