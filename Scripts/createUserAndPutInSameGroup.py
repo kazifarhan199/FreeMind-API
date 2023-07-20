@@ -4,10 +4,11 @@ import json
 pre = 'user'
 start_number = 101
 group_name = f"Group {start_number}"
+base_url = "https://csgrad08.d.umn.edu"
 
 
 def createUser(username, password):
-    url = 'https://csgrad08.d.umn.edu/accounts/register/'
+    url = f'{base_url}/accounts/register/'
     myobj = {'username': username, 'password': password, 'email': f'{username}@email.com', 'devicetoken':'token', 'devicename':'name', 'devicetype':'android'}
     x = requests.post(url, json = myobj)
     _respose = json.loads(x.text)
@@ -17,7 +18,7 @@ def createUser(username, password):
 
 
 def createGroup(g_name, token):
-    url = 'https://csgrad08.d.umn.edu/groups/create/'
+    url = f'{base_url}/groups/create/'
     myobj = {'group_name': g_name}
     headers = {"Content-Type": "application/json; charset=utf-8", 'Authorization': f'Token {token}', 'Device': 'token'}
     x = requests.post(url, json = myobj, headers=headers)
@@ -26,7 +27,7 @@ def createGroup(g_name, token):
     return _respose['id']
 
 def addToGroup(gid, email, token):
-    url = f'https://csgrad08.d.umn.edu/groups/members/?group={gid}'
+    url = f'{base_url}/groups/members/?group={gid}'
     myobj = {'email': email}
     headers = {"Content-Type": "application/json; charset=utf-8", 'Authorization': f'Token {token}', 'Device': 'token'}
     x = requests.post(url, json = myobj, headers=headers)
