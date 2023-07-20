@@ -5,6 +5,7 @@ url = 'http://localhost:59000/recommendations/label/edit/'
 
 def load_data():
     file_path = input("Enter the path to the file to load: ")
+    # example ../archive/csvs/kazi_final_study.csv
     df = pd.read_csv(file_path)
     df = df.fillna('.')
     i = 1

@@ -1,0 +1,66 @@
+label,type,reason,link,is_label,is_coupuled
+Practice gratitude,Stress,Practicing gratitude and appreciating the good aspects of life positively impacts your mental wellbeing.,https://www.takingcharge.csh.umn.edu/enhance-your-wellbeing/health/thoughts-emotions/increase-positivity,T,F
+Spend time in nature,Stress,"Spending time outdoors boosts moods and reduces stress, pain, and anger.",https://www.takingcharge.csh.umn.edu/nature-us,T,F
+Be kind,Stress,Lending a helping hand scientifically increases positivity and lengthens lifespan,https://www.takingcharge.csh.umn.edu/enhance-your-wellbeing/health/thoughts-emotions/increase-positivity,T,F
+Connect with others,Stress,"Social interaction boosts confidence and self-esteem, as well as fights stress, depression, and anxiety.",https://www.takingcharge.csh.umn.edu/enhance-your-wellbeing/health/thoughts-emotions/increase-positivity,T,F
+Promote Positivity,Stress,"Thinking optimistically broadens perspectives and strengthens your mental health, even during difficult times.",https://www.takingcharge.csh.umn.edu/enhance-your-wellbeing/health/thoughts-emotions/increase-positivity,T,F
+Physical Activity,Stress,"Physical exercise reduces risk of disease, increases lifespan, and improves mental health.",https://www.takingcharge.csh.umn.edu/physical-activity-fitness,T,F
+Yoga,Stress,Yoga calms the mind and improves mood.,https://www.takingcharge.csh.umn.edu/yoga,T,F
+Set Goals,Stress,"Setting goals induces feelings of accomplishment, pride, and happiness.",https://www.takingcharge.csh.umn.edu/set-goals-connected-purpose,T,F
+Practice Mindfulness,Stress,Mindfulness improves emotional health and wellbeing.,https://www.takingcharge.csh.umn.edu/explore-healing-practices/mindfulness,T,F
+Declutter your space,Stress,Decluttering promotes a soothing and calm environment.,https://www.takingcharge.csh.umn.edu/activities/what-healing-environment-you ,T,F
+Sleep,Stress,Sleep is essential and positively impacts physical and mental health.,https://www.takingcharge.csh.umn.edu/why-sleep-important,T,F
+Use ‘I’ statements to deal with conflicts,Stress,Using ‘I’ statements may  contribute to effective conflict resolution,https://www.communicationandconflict.com/i-statements.html,T,F
+Practice Stress Reduction techniques,Stress,Practicing relaxation techniques is a stress-reducing strategy that produces a greater sense of wellbeing,https://www.takingcharge.csh.umn.edu/learn-relaxation-techniques,T,F
+Yoga,Exercise,"Yoga reduces stress, and increases strength and flexibility. ",https://www.takingcharge.csh.umn.edu/yoga,T,F
+Physical Activity & Fitness,Exercise,"Aerobics improves health, protects against disease, and boosts moods.",https://www.takingcharge.csh.umn.edu/physical-activity-fitness,T,F
+Stretching,Exercise,"Stretching improves cardiovascular health, balance and flexibility.",https://www.takingcharge.csh.umn.edu/include-aerobic-activities,T,F
+Going to the Gym,Exercise,Fitness improves physical wellbeing and overall mental health.,https://umdrsop.d.umn.edu/programs/fitness-wellness,T,F
+Walking through campus,Exercise,"Walking strengthens muscles and bones, improves physical energy and mood.",https://www.takingcharge.csh.umn.edu/include-aerobic-activities,T,F
+Hiking,Exercise,Hiking can help keep your thinking and learning skills sharp and help with better sleep.,https://www.cdc.gov/physicalactivity/basics/pa-health/index.htm,T,F
+Cardio,Exercise,"Cardio improves fitness and helps to improve sleep, in turn reducing stress anxiety.",https://umdrsop.d.umn.edu/programs/fitness-wellness/group-fitness,T,F
+Sports,Exercise,"Sports calm your mind, strengthen your muscles, and improve your overall well-being.",https://umdrsop.d.umn.edu/programs/sport-clubs,T,F
+Get outside,Exercise,"Getting outside relaxes and refreshes us, enhancing positivity",https://www.takingcharge.csh.umn.edu/nature-us,T,F
+Short Workout,Exercise,Short workouts are just as effective as a full gym session for your body and mind,https://www.nwpc.com/10-minute-workouts/,T,F
+Eating Whole Foods,Food,Eating whole foods provides adequate nutrients and helps maintain healthy weight.,https://www.takingcharge.csh.umn.edu/why-eat-whole-foods,T,F
+Drinking water,Food,"Drinking water serves as the body’s solvent, flushes toxins and excess nutrients.",https://www.cdc.gov/nutrition/data-statistics/plain-water-the-healthier-choice.html,T,F
+Eating fruit and vegetables,Food,Eating fruits and vegetables increase feeling of fullness and promotes healing,https://www.takingcharge.csh.umn.edu/how-should-i-start,T,F
+Pay attention as you eat,Food,Eating under stress may affect  what you eat and digestion.,https://www.takingcharge.csh.umn.edu/mindfulness-helps-us-digest-and-enjoy-our-food,T,F
+Eating a variety of foods,Food,Diversifying foods boosts mood and immune system.,https://www.takingcharge.csh.umn.edu/how-should-i-start,T,F
+Including good fats into your diet,Food,Good fats improves the immune system and lowers risk of disease.,https://www.takingcharge.csh.umn.edu/how-should-i-start,T,F
+Make eating a positive experience,Food,Mindful eating reduces overeating and increases your awareness while eating.,https://www.takingcharge.csh.umn.edu/make-eating-positive-experience ,T,F
+Combine healthy eating with exercise,Food,Diet alone is not as effective in achieving a healthy body weight.,https://www.takingcharge.csh.umn.edu/what-experts-recommend-healthy-eating,T,F
+Eat Probiotic-rich foods,Food,Probiotic-rich foods such as yogurt may help with social anxiety.,http://www.ncbi.nlm.nih.gov/pubmed/25998000,T,F
+Eat Oatmeal for Breakfast,Food,Oatmeal for breakfast can be a great choice to lift your mood.,https://www.healthdigest.com/452260/can-oatmeal-put-you-in-a-better-mood/,T,F
+How would you rate your mental and emotional health?,Stress,.,.,F,F
+How would you rate your ability to handle stress?,Stress,.,.,F,F
+How would you rate your amount and quality of sleep?,Stress,.,.,F,F
+How would you rate your level of physical activity?,Exercise,.,.,F,F
+How would you rate your diet and nutrition?,Food,.,.,F,F
+"Caption: Just had a great dinner 
+
+Recommendation: Drinking water serves as the body’s solvent, flushes toxins and excess nutrients.""",Food-Food,.,.,F,T
+"Caption: Just had a great dinner
+
+Recommendation: Stretching improves cardiovascular health, balance and flexibility.",Food-Exercise,.,.,F,T
+"Caption: Just had a great dinner
+
+Recommendation: Sleep is essential and positively impacts physical and mental health.",Food-Stress,.,.,F,T
+"Caption: Had a great workout
+
+Recommendation: Eating fruits and vegetables increase feeling of fullness and promotes healing",Exercise-Food,.,.,F,T
+"Caption: Had a great workout
+
+Recommendation: Stretching improves cardiovascular health, balance and flexibility.",Exercise-Exercise,.,.,F,T
+"Caption: Had a great workout
+
+Recommendation: Lending a helping hand scientifically increases positivity and lengthens lifespan",Exercise-Stress,.,.,F,T
+"Caption: Feeling stressed
+
+Recommendation: Drinking water serves as the body’s solvent, flushes toxins and excess nutrients.",Stress-Food,.,.,F,T
+"Caption: Feeling stressed
+
+Recommendation: Fitness improves physical wellbeing and overall mental health.",Stress-Exercise,.,.,F,T
+"Caption: Feeling stressed
+
+Recommendation: Social interaction boosts confidence and self-esteem, as well as fights stress, depression, and anxiety.",Stress-Stress,.,.,F,T
