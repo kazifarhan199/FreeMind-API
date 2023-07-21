@@ -27,7 +27,7 @@ def load_data():
             'group_based': row[9],
         }
         i+=1
-        resp = requests.post(url, json = data)
+        resp = requests.post(url, json = data, headers=headers)
         print(resp, '--', resp.text)
 
 load_data()
